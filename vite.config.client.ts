@@ -11,6 +11,7 @@ export default ({ mode }: { mode: 'development' | 'production' }) => {
 
   return defineConfig({
     root: './client',
+    envDir: '../',
     plugins: [vue({ features: { optionsAPI: false } }), vueDevTools()],
     resolve: {
       alias: {
