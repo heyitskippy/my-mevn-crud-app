@@ -12,17 +12,20 @@
     "build": "run-p type-check 'build-only:server {@}' 'build-only:client {@}' --",
     "preview": "concurrently --names server,client --prefix-colors yellow,green \"node dist/server/index.cjs\" \"vite preview\"",
     "test:unit": "vitest",
-    "prepare": "cypress install",
+    "prepare:cypress": "cypress install",
     "test:e2e": "dotenv -e .env.production -- start-test preview http://localhost:4173/cypress 'cypress run --e2e'",
     "test:e2e:dev": "dotenv -e .env.development -- start-test 'yarn dev' http://localhost:3870/cypress 'cypress open --e2e'",
     "type-check": "vue-tsc --build",
     "lint": "eslint ./client/src/ --fix",
-    "format": "prettier --write client/src/"
+    "format": "prettier --write client/src/",
+    "prepare:mongo:dev": "dotenv -e .env.development -- docker compose -f server/docker-compose.yml up -d",
+    "prepare:mongo:prod": "dotenv -e .env.production -- docker compose -f server/docker-compose.yml up -d"
   },
   "dependencies": {
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "mongoose": "^8.10.1",
     "pinia": "^2.3.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"

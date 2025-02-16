@@ -1,0 +1,16 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: ${VITE_MONGO_CONTAINER}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${VITE_MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${VITE_MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=${VITE_MONGO_DB_NAME}
+    restart: on-failure
+    ports:
+      - '${VITE_MONGO_PORT}:27017'
+    volumes:
+      - mongodb:/data/db
+
+volumes:
+  mongodb:

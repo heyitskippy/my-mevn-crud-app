@@ -12,6 +12,7 @@ export default ({ mode }: { mode: 'development' | 'production' }) => {
         adapter: 'express',
         appPath: './server',
         exportName: 'server',
+        initAppOnBoot: true,
       }),
     ],
     server: {
