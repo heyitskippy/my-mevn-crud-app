@@ -11,5 +11,5 @@ export const startProdServer = (app: Application) => {
 
   app.listen(PORT)
 
-  console.log(`   %c➜%c  Listening on ${BASE}:${PORT}/`, 'color:green;')
+  console.log(`  ➜  Listening: ${BASE}:${PORT}/`)
 }

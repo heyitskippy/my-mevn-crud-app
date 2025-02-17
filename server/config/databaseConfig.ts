@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose'
 
 const DB_USER = import.meta.env.VITE_MONGO_USERNAME
@@ -12,9 +13,9 @@ export const connectDB = async () => {
   try {
     await mongoose.connect(url)
 
-    console.log('Connected to the database!')
-  } catch (e: unknown) {
-    console.error("Can't connect to the database!", e)
+    console.log('\n', 'DB: connected!')
+  } catch (e: any) {
+    console.error('\n', 'DB: connection failed!', e.message)
     process.exit(1)
   }
 }

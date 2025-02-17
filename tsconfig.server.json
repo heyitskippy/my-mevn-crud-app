@@ -1,6 +1,6 @@
 {
   "include": ["env.d.ts", "server/**/*"],
-  "exclude": ["server/**/__tests__/*"],
+  "exclude": ["server/tests/*"],
   "compilerOptions": {
     "noEmit": true,
 

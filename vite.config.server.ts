@@ -26,7 +26,7 @@ export default ({ mode }: { mode: 'development' | 'production' }) => {
         },
       },
       sourcemap: true,
-      // minify: true,
+      minify: true,
     },
   })
 }
