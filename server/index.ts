@@ -8,6 +8,7 @@ import usersRouter from './routes/users'
 
 import { connectDB } from './config/databaseConfig'
 import { startProdServer } from './config/prodServerConfig'
+import { loggerMiddleware } from './middlewares/loggerMiddleware'
 
 const app = express()
 
@@ -20,6 +21,10 @@ connectDB()
 app.use(commonRouter)
 app.use('/api/users', usersRouter)
 
-if (!import.meta.env.DEV) startProdServer(app)
+if (!import.meta.env.DEV) {
+  startProdServer(app)
+} else {
+  app.use(loggerMiddleware)
+}
 
 export const server = app
