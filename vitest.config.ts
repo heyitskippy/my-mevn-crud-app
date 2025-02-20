@@ -8,6 +8,7 @@ import {
   defineConfig,
   coverageConfigDefaults,
 } from 'vitest/config'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 import viteClientConfig from './vite.config.client'
 
@@ -18,23 +19,27 @@ export default () => {
   return defineConfig({
     test: {
       env,
-      coverage: {
-        exclude: [
-          'client/src/router/**',
-          'client/src/main.ts',
-          'server/types/**',
-          ...coverageConfigDefaults.exclude,
-        ],
-      },
       workspace: [
         defineProject({
+          plugins: [tsconfigPaths()],
           server: {
             port: +env.VITE_SERVER_PORT,
           },
           test: {
-            name: 'server',
+            name: 'server:integration',
             environment: 'node',
-            include: ['tests/*'],
+            include: ['tests/*.integration-test.ts'],
+            setupFiles: ['tests/setup/setup.integration.ts'],
+            root: fileURLToPath(new URL('./server', import.meta.url)),
+          },
+        }),
+        defineProject({
+          plugins: [tsconfigPaths()],
+          test: {
+            name: 'server:unit',
+            environment: 'node',
+            include: ['./**/__tests__/*'],
+            setupFiles: ['tests/setup/setup.unit.ts'],
             root: fileURLToPath(new URL('./server', import.meta.url)),
           },
         }),
@@ -50,6 +55,9 @@ export default () => {
           }),
         ),
       ],
+      coverage: {
+        exclude: ['client/src/router/**', 'client/src/main.ts', ...coverageConfigDefaults.exclude],
+      },
     },
   })
 }

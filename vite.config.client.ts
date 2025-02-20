@@ -28,7 +28,6 @@ export default ({ mode }: { mode: 'development' | 'production' }) => {
       },
     },
     build: {
-      // To ensure that the server files are preserved
       outDir: '../dist',
       emptyOutDir: false,
       sourcemap: true,

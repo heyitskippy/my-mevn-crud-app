@@ -6,9 +6,10 @@ import bodyParser from 'body-parser'
 import commonRouter from './routes/common'
 import usersRouter from './routes/users'
 
+import loggerMiddleware from './middlewares/loggerMiddleware'
+
 import { connectDB } from './config/databaseConfig'
 import { startProdServer } from './config/prodServerConfig'
-import { loggerMiddleware } from './middlewares/loggerMiddleware'
 
 const app = express()
 
@@ -16,10 +17,12 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-connectDB()
+const API = import.meta.env.VITE_API
 
 app.use(commonRouter)
-app.use('/api/users', usersRouter)
+app.use(`${API}/users`, usersRouter)
+
+connectDB()
 
 if (!import.meta.env.DEV) {
   startProdServer(app)

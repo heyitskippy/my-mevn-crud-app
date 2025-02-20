@@ -1,5 +1,6 @@
 {
   "name": "my-mevn-crud-app",
+  "author": "heyitskippy",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -11,8 +12,8 @@
     "build-only:server": "vite build --config vite.config.server.ts",
     "build": "run-p type-check 'build-only:server {@}' 'build-only:client {@}' --",
     "preview": "concurrently --names server,client --prefix-colors yellow,green \"node dist/server/index.cjs\" \"vite preview\"",
-    "test:unit": "vitest",
-    "coverage:unit": "vitest run --coverage",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
     "prepare:cypress": "cypress install",
     "test:e2e": "dotenv -e .env.production -- start-test preview http://localhost:4173/cypress 'cypress run --e2e'",
     "test:e2e:dev": "dotenv -e .env.development -- start-test 'yarn dev' http://localhost:3870/cypress 'cypress open --e2e'",
@@ -32,6 +33,7 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.5.0",
     "@tsconfig/node22": "^22.0.0",
     "@types/body-parser": "^1",
     "@types/cors": "^2",
@@ -56,6 +58,7 @@
     "jiti": "^2.4.2",
     "jsdom": "^26.0.0",
     "morgan": "^1.10.0",
+    "node-mocks-http": "^1.16.2",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.4.2",
     "start-server-and-test": "^2.0.10",
@@ -64,6 +67,7 @@
     "vite": "^6.0.11",
     "vite-plugin-node": "^4.0.0",
     "vite-plugin-vue-devtools": "^7.7.1",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.5",
     "vue-tsc": "^2.2.0"
   },

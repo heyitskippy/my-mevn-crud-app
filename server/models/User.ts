@@ -1,11 +1,10 @@
-import type { MongoUser } from '../types/users'
-import { Role } from '../types/users'
+import type { IUser, UserEntity } from '~/types/users'
+import { Role } from '~/types/users'
 
-import { Schema, model } from 'mongoose'
+import { Model, Schema, model } from 'mongoose'
 
-const userSchema = new Schema<MongoUser>(
+const userSchema = new Schema<IUser>(
   {
-    id: Schema.ObjectId,
     fullName: {
       type: String,
       required: true,
@@ -23,16 +22,19 @@ const userSchema = new Schema<MongoUser>(
   },
   {
     timestamps: true,
+    id: true,
     toJSON: {
       virtuals: true,
       versionKey: false,
       transform: (_, ret) => {
+        const id = ret.id
+
         delete ret._id
 
-        return ret
+        return { ...ret, id }
       },
     },
   },
 )
 
-export default model<MongoUser>('user', userSchema)
+export default model<IUser, Model<UserEntity>>('User', userSchema)

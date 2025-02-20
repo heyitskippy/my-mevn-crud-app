@@ -1,14 +1,14 @@
-import type { Document } from 'mongoose'
+import type { Entity, Dates } from '.'
 
-export enum Role {
-  Admin = 'admin',
-  User = 'user',
-}
+export interface UserEntity extends IUser, Entity, Dates {}
 
-export interface UserEntity {
+export interface IUser {
   fullName: string
   email: string
   role: Role
 }
 
-export interface MongoUser extends UserEntity, Document {}
+export enum Role {
+  Admin = 'admin',
+  User = 'user',
+}

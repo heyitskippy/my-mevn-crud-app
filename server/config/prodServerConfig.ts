@@ -9,7 +9,11 @@ export const startProdServer = (app: Application) => {
   const BASE = import.meta.env.VITE_BASE
   const PORT = import.meta.env.VITE_SERVER_PORT
 
-  app.listen(PORT)
+  const server = app.listen(PORT)
+
+  app.emit('started')
 
   console.log(`  ➜  Listening: ${BASE}:${PORT}/`)
+
+  return server
 }
