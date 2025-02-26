@@ -1,7 +1,7 @@
 import type { Request } from 'express'
 import type { DeleteResult } from 'mongoose'
-import type { ID } from '~/../types'
-import type { IUser } from '~/../types/users'
+import type { ID } from '_/types'
+import type { IUser } from '_/types/users'
 
 import { describe, expect, it, vi } from 'vitest'
 import mockHttp from 'node-mocks-http'
@@ -117,6 +117,28 @@ describe('userController', () => {
     vi.spyOn(userService, 'deleteUser').mockReturnValue(Promise.resolve(undefined))
 
     await userController.delete(req, res, next)
+    expect(res.statusCode).toBe(500)
+  })
+
+  it('createMany should return users or throw an error', async (ctx) => {
+    const req = mockHttp.createRequest()
+    const res = mockHttp.createResponse()
+    const next = vi.fn()
+
+    const users = Array.from({ length: 20 }).map(() => ctx.fixtures.generateUser())
+
+    vi.spyOn(userService, 'addUserList').mockReturnValue(Promise.resolve(users))
+
+    await userController.createMany(req, res, next)
+
+    expect(res.statusCode).toBe(201)
+    expect(res._getJSONData()).toEqual({ users })
+
+    vi.spyOn(userService, 'addUserList').mockImplementation(() => {
+      throw Error('Error!')
+    })
+
+    await userController.create(req, res, next)
     expect(res.statusCode).toBe(500)
   })
 

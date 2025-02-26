@@ -1,5 +1,5 @@
-import type { IUser, UserEntity } from '~/../types/users'
-import { Role } from '~/../types/users'
+import type { IUser, UserEntity } from '_/types/users'
+import { Role } from '_/types/users'
 
 import { Model, Schema, model } from 'mongoose'
 

@@ -1,5 +1,4 @@
 import { loadEnv } from 'vite'
-import { fileURLToPath } from 'node:url'
 
 import {
   mergeConfig,
@@ -8,6 +7,7 @@ import {
   defineConfig,
   coverageConfigDefaults,
 } from 'vitest/config'
+
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 import viteClientConfig from './vite.config.client'
@@ -22,35 +22,33 @@ export default () => {
       workspace: [
         defineProject({
           plugins: [tsconfigPaths()],
+          test: {
+            name: 'server:unit',
+            environment: 'node',
+            include: ['./server/**/__tests__/*'],
+            setupFiles: ['./server/tests/setup/setup.unit.ts'],
+          },
+        }),
+        defineProject({
+          plugins: [tsconfigPaths()],
           server: {
             port: +env.VITE_SERVER_PORT,
           },
           test: {
             name: 'server:integration',
             environment: 'node',
-            include: ['tests/*.integration-test.ts'],
-            setupFiles: ['tests/setup/setup.integration.ts'],
-            root: fileURLToPath(new URL('./server', import.meta.url)),
-          },
-        }),
-        defineProject({
-          plugins: [tsconfigPaths()],
-          test: {
-            name: 'server:unit',
-            environment: 'node',
-            include: ['./**/__tests__/*'],
-            setupFiles: ['tests/setup/setup.unit.ts'],
-            root: fileURLToPath(new URL('./server', import.meta.url)),
+            include: ['./server/tests/*.integration-test.ts'],
+            setupFiles: ['./server/tests/setup/setup.integration.ts'],
           },
         }),
         mergeConfig(
           viteClientConfig({ mode }),
           defineProject({
             test: {
-              name: 'client',
+              name: 'client:unit',
               environment: 'jsdom',
-              exclude: [...configDefaults.exclude, 'e2e/**'],
-              root: fileURLToPath(new URL('./client', import.meta.url)),
+              setupFiles: ['./client/src/tests/setup/setup.unit.ts'],
+              exclude: [...configDefaults.exclude],
             },
           }),
         ),

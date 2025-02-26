@@ -1,0 +1,38 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+import routes from '@/router/routes'
+
+const menu = computed(() =>
+  routes.map((routeItem) => ({ name: routeItem.name, title: routeItem.name })),
+)
+</script>
+
+<template>
+  <div
+    class="sticky top-0 z-50 border border-gray-100 bg-white/70 shadow-xl shadow-blue-50 backdrop-blur-sm"
+  >
+    <header class="h-16 flex items-center max-w-7xl px-10 mx-auto">
+      <router-link
+        class="mr-10 block text-5xl font-extralight text-gray-600 uppercase subpixel-antialiased no-underline"
+        to="/"
+      >
+        MY MEVN APP
+      </router-link>
+
+      <nav class="flex gap-4">
+        <template v-for="item in menu" :key="item.name">
+          <router-link v-if="item.name !== 'home'" :to="{ name: item.name }" class="capitalize">
+            {{ item.title }}
+          </router-link>
+        </template>
+      </nav>
+    </header>
+  </div>
+</template>
+
+<style scoped>
+nav a {
+  @apply no-underline hover:underline;
+}
+</style>

@@ -1,7 +1,7 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 import type { Request, Response, NextFunction } from 'express'
-import type { ID } from '@/../../types'
-import type { IUser } from '@/../../types/users'
+import type { ID } from '_/types'
+import type { IUser } from '_/types/users'
 
 import userService from '~/services/userService'
 
@@ -98,6 +98,24 @@ const deleteUser = async (req: Request<{ id: ID }>, res: Response, next: NextFun
   }
 }
 
+const createUserList = async (req: Request, res: Response, next: NextFunction) => {
+  const list: IUser[] = req.body
+
+  try {
+    const users = await userService.addUserList(list)
+
+    res.status(201).json({ users })
+
+    next()
+  } catch (e: any) {
+    console.error('[createUserList]', e.message)
+
+    res.sendStatus(500)
+
+    next(e)
+  }
+}
+
 const deleteAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const deleteResult = await userService.deleteAllUsers()
@@ -123,5 +141,6 @@ export default {
   getById: getUserById,
   update: updateUser,
   delete: deleteUser,
+  createMany: createUserList,
   deleteAll: deleteAllUsers,
 }

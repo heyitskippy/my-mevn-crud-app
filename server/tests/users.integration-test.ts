@@ -1,5 +1,5 @@
-import type { ID, Maybe } from '~/../types'
-import type { IUser } from '~/../types/users'
+import type { ID, Maybe } from '_/types'
+import type { IUser } from '_/types/users'
 
 import { describe, expect, it } from 'vitest'
 
@@ -14,14 +14,14 @@ describe(`${API}${route}`, () => {
   }
   let id: Maybe<ID> = null
 
-  it(`GET should return a list of users`, async (ctx) => {
+  it(`GET / should return a list of users`, async (ctx) => {
     const response = await ctx.request.get(`${API}${route}`)
 
     expect(response.statusCode).toBe(200)
     expect(response.body.users).toBeDefined()
   })
 
-  it('POST should return a new user', async (ctx) => {
+  it('POST / with an object should return a new user', async (ctx) => {
     Object.assign(newUser, ctx.fixtures.generateUser())
 
     const response = await ctx.request.post(`${API}${route}`).send(newUser)
@@ -65,7 +65,17 @@ describe(`${API}${route}`, () => {
     expect(res.body.user.id).toBe(id)
   })
 
-  it.skip('DELETE should return deletedCount which is equal to users.length', async (ctx) => {
+  it.skip('POST / with an array should return a list of new users', async (ctx) => {
+    const users = Array.from({ length: 20 }).map(() => ctx.fixtures.generateUser())
+    const response = await ctx.request.post(`${API}${route}`).send(users)
+
+    expect(response.statusCode).toBe(201)
+    expect(response.body.users).toBeDefined()
+
+    expect(response.body.users).toEqual(users.map((user) => expect.objectContaining(user)))
+  })
+
+  it.skip('DELETE / should return deletedCount which is equal to users.length', async (ctx) => {
     let response = await ctx.request.post(`${API}${route}`).send(newUser)
     expect(response.body.user).toBeDefined()
 

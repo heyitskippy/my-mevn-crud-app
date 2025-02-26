@@ -29,9 +29,11 @@
 
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.server.tsbuildinfo",
 
+    "baseUrl": ".",
     "paths": {
-      "~/*": ["./server/*"],
-      "@/*": ["./client/src/*"]
+      "_/*": ["./*"],
+      "@/*": ["./client/src/*"],
+      "~/*": ["./server/*"]
     }
   }
 }
