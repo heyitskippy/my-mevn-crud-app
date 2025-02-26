@@ -1,7 +1,7 @@
 import type { Request } from 'express'
 import type { DeleteResult } from 'mongoose'
-import type { ID } from '~/types'
-import type { IUser } from '~/types/users'
+import type { ID } from '~/../types'
+import type { IUser } from '~/../types/users'
 
 import { describe, expect, it, vi } from 'vitest'
 import mockHttp from 'node-mocks-http'

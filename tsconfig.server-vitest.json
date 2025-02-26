@@ -1,0 +1,18 @@
+{
+  "extends": ["./tsconfig.server.json"],
+  "include": [
+    "server/**/__tests__/*",
+    "server/tests/*",
+    "server/tests/setup/*",
+    "types/__tests__/*",
+    "env.d.ts",
+    "vite-types.d.ts"
+  ],
+  "exclude": [],
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.server-vitest.tsbuildinfo",
+
+    "lib": ["ESNext"],
+    "types": ["node"]
+  }
+}

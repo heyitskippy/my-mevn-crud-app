@@ -11,7 +11,10 @@
       "path": "./tsconfig.client.json"
     },
     {
-      "path": "./tsconfig.vitest.json"
+      "path": "./tsconfig.client-vitest.json"
+    },
+    {
+      "path": "./tsconfig.server-vitest.json"
     }
   ],
   "compilerOptions": {

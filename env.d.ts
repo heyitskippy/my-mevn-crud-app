@@ -1,7 +1,4 @@
 /// <reference types="vite/client" />
-import type TestAgent from 'supertest/lib/agent'
-
-import fixtures from './server/tests/setup/fixtures.integration'
 
 interface ImportMetaEnv {
   VITE_BASE: string
@@ -18,11 +15,6 @@ interface ImportMetaEnv {
   VITE_MONGO_PASSWORD: string
 }
 
-declare module 'vitest' {
-  export interface TestContext {
-    request: TestAgent
-    fixtures: typeof fixtures
-  }
+interface ImportMeta {
+  readonly env: ImportMetaEnv
 }
-
-export {}

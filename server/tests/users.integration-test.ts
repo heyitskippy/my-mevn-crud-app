@@ -1,6 +1,5 @@
-import type { ID, Maybe } from '~/types'
-import type { MakeMaybe } from '~/types/utilities'
-import type { IUser } from '~/types/users'
+import type { ID, Maybe } from '~/../types'
+import type { IUser } from '~/../types/users'
 
 import { describe, expect, it } from 'vitest'
 
@@ -8,7 +7,7 @@ const API = import.meta.env.VITE_API
 const route = '/users'
 
 describe(`${API}${route}`, () => {
-  const newUser: MakeMaybe<IUser, 'fullName' | 'email' | 'role'> = {
+  const newUser = {
     fullName: null,
     email: null,
     role: null,

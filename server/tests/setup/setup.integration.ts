@@ -1,7 +1,7 @@
 import { afterAll, beforeEach } from 'vitest'
 import supertest from 'supertest'
 
-import * as fixtures from './fixtures.integration'
+import * as fixtures from './fixtures'
 
 import { server as app } from '~/index'
 import { disconnectDB } from '~/config/databaseConfig'

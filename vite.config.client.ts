@@ -1,9 +1,10 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig, loadEnv } from 'vite'
-
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
+
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default ({ mode }: { mode: 'development' | 'production' }) => {
@@ -12,10 +13,11 @@ export default ({ mode }: { mode: 'development' | 'production' }) => {
   return defineConfig({
     root: './client',
     envDir: '../',
-    plugins: [vue({ features: { optionsAPI: false } }), vueDevTools()],
+    plugins: [vue({ features: { optionsAPI: false } }), vueDevTools(), tailwindcss()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./client/src', import.meta.url)),
+        '~/': fileURLToPath(new URL('./server/', import.meta.url)),
       },
     },
     server: {

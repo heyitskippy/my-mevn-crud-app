@@ -1,6 +1,6 @@
 import { beforeEach, afterEach, vi } from 'vitest'
 
-import * as fixtures from './fixtures.integration'
+import * as fixtures from './fixtures'
 
 beforeEach(async (ctx) => {
   ctx.fixtures = fixtures

@@ -6,9 +6,7 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    "eslint.config.*",
-    "vite.config.client.*",
-    "vite.config.server.*"
+    "eslint.config.*"
   ],
   "compilerOptions": {
     "noEmit": true,

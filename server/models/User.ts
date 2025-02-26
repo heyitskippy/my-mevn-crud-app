@@ -1,5 +1,5 @@
-import type { IUser, UserEntity } from '~/types/users'
-import { Role } from '~/types/users'
+import type { IUser, UserEntity } from '~/../types/users'
+import { Role } from '~/../types/users'
 
 import { Model, Schema, model } from 'mongoose'
 
@@ -27,11 +27,9 @@ const userSchema = new Schema<IUser>(
       virtuals: true,
       versionKey: false,
       transform: (_, ret) => {
-        const id = ret.id
-
         delete ret._id
 
-        return { ...ret, id }
+        return { id: ret.id, ...ret }
       },
     },
   },

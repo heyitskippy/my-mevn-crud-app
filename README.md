@@ -1,4 +1,8 @@
-# my-mevn-crud-app
+# My MEVN CRUD App (Client + Server)
+
+— MongoDB, Express, Vue, Node;
+— Vite, Vitest, Cypress, TailwindCSS;
+— Client and Server share the same package.json, .env, etc.
 
 ## Project Setup
 
@@ -18,30 +22,37 @@ yarn dev
 yarn build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+### Run Unit & Integration Tests with [Vitest](https://vitest.dev/)
 
 ```sh
-yarn test:unit
+yarn test
+```
+
+### Coverage with [Vitest](https://vitest.dev/)
+
+```sh
+yarn coverage
 ```
 
 ### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+
+Development server:
 
 ```sh
 yarn test:e2e:dev
 ```
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
+Production build:
 
 ```sh
 yarn build
 yarn test:e2e
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+### Prepare MongoDB with Docker for Development
 
 ```sh
-yarn lint
+yarn prepare:mongo:dev
 ```
+
+Check package.json scripts for more.
