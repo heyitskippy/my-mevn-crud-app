@@ -20,7 +20,9 @@ export default ({ mode }: { mode: 'development' | 'production' }) => {
       tailwindcss(),
     ],
     resolve: {
+      // for .vue files
       alias: {
+        _: fileURLToPath(new URL('.', import.meta.url)),
         '@': fileURLToPath(new URL('./client/src', import.meta.url)),
       },
     },

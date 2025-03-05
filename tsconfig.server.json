@@ -1,6 +1,11 @@
 {
-  "include": ["server/**/*", "types/*", "env.d.ts", "vite-types.d.ts"],
-  "exclude": ["server/tests/*", "server/**/__tests__/*", "types/__tests__/*"],
+  "include": ["server/**/*", "helpers/*", "tests/*", "types/*", "env.d.ts", "vite-types.d.ts"],
+  "exclude": [
+    "server/tests/*",
+    "server/tests/*.integration-test.ts",
+    "server/**/__tests__/*",
+    "helpers/__tests__/*"
+  ],
   "compilerOptions": {
     "noEmit": true,
 

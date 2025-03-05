@@ -1,7 +1,7 @@
 # My MEVN CRUD App (Client + Server)
 
-— MongoDB, Express, Vue, Node;
-— Vite, Vitest, Cypress, TailwindCSS;
+— MongoDB, Express, Vue, Node;  
+— Vite, Vitest, Cypress, TailwindCSS;  
 — Client and Server share the same package.json, .env, etc.
 
 ## Project Setup

@@ -10,11 +10,11 @@ const menu = computed(() =>
 
 <template>
   <div
-    class="sticky top-0 z-50 border border-gray-100 bg-white/70 shadow-xl shadow-blue-50 backdrop-blur-sm"
+    class="sticky top-0 z-40 border border-gray-100 bg-white/70 shadow-xl shadow-blue-50 backdrop-blur-sm"
   >
-    <header class="h-16 flex items-center max-w-7xl px-10 mx-auto">
+    <header class="flex items-center max-w-7xl px-10 mx-auto">
       <router-link
-        class="mr-10 block text-5xl font-extralight text-gray-600 uppercase subpixel-antialiased no-underline"
+        class="mr-10 block text-5xl font-extralight text-gray-600 uppercase subpixel-antialiased no-underline whitespace-nowrap"
         to="/"
       >
         MY MEVN APP
@@ -32,6 +32,10 @@ const menu = computed(() =>
 </template>
 
 <style scoped>
+header {
+  height: var(--header-height);
+}
+
 nav a {
   @apply no-underline hover:underline;
 }

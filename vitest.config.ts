@@ -25,7 +25,7 @@ export default () => {
           test: {
             name: 'server:unit',
             environment: 'node',
-            include: ['./server/**/__tests__/*'],
+            include: ['./server/**/__tests__/*', './helpers/__tests__/*'],
             setupFiles: ['./server/tests/setup/setup.unit.ts'],
           },
         }),

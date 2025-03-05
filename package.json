@@ -14,7 +14,7 @@
     "preview": "concurrently --names server,client --prefix-colors yellow,green \"node dist/server/index.cjs\" \"vite preview\"",
     "test": "vitest --silent --run",
     "test:server": "vitest --project=server:unit --project=server:integration --silent --run",
-    "test:client": "vitest --project=client:unit --silent --run",
+    "test:client": "vitest --project=client:unit --run",
     "coverage": "vitest run --coverage",
     "prepare:cypress": "cypress install",
     "test:e2e": "dotenv -e .env.production -- start-test preview http://localhost:4173/cypress 'cypress run --e2e'",

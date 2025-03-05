@@ -1,4 +1,7 @@
 import type { Entity, Dates } from '.'
+import type { MakeMaybe } from './utilities'
+
+export type NullableUserEntity = MakeMaybe<UserEntity>
 
 export interface UserEntity extends IUser, Entity, Dates {}
 

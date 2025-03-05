@@ -1,7 +1,7 @@
 import type { Request } from 'express'
 import type { DeleteResult } from 'mongoose'
 import type { ID } from '_/types'
-import type { IUser } from '_/types/users'
+import type { IUser, UserEntity } from '_/types/users'
 
 import { describe, expect, it, vi } from 'vitest'
 import mockHttp from 'node-mocks-http'
@@ -15,7 +15,7 @@ describe('userController', () => {
     const res = mockHttp.createResponse()
     const next = vi.fn()
 
-    const users = [ctx.fixtures.generateUser(), ctx.fixtures.generateUser()]
+    const users = [ctx.fixtures.generateUser<UserEntity>(), ctx.fixtures.generateUser<UserEntity>()]
 
     vi.spyOn(userService, 'fetchUsers').mockReturnValue(Promise.resolve(users))
 
@@ -37,7 +37,7 @@ describe('userController', () => {
     const res = mockHttp.createResponse()
     const next = vi.fn()
 
-    const user = ctx.fixtures.generateUser()
+    const user = ctx.fixtures.generateUser<UserEntity>()
 
     vi.spyOn(userService, 'addUser').mockReturnValue(Promise.resolve(user))
 
@@ -61,7 +61,7 @@ describe('userController', () => {
     const res = mockHttp.createResponse()
     const next = vi.fn()
 
-    const user = ctx.fixtures.generateUser()
+    const user = ctx.fixtures.generateUser<UserEntity>()
 
     vi.spyOn(userService, 'fetchUserById').mockReturnValue(Promise.resolve(user))
 
@@ -83,7 +83,7 @@ describe('userController', () => {
     const res = mockHttp.createResponse()
     const next = vi.fn()
 
-    const user = ctx.fixtures.generateUser()
+    const user = ctx.fixtures.generateUser<UserEntity>()
 
     vi.spyOn(userService, 'updateUser').mockReturnValue(Promise.resolve(user))
 
@@ -105,7 +105,7 @@ describe('userController', () => {
     const res = mockHttp.createResponse()
     const next = vi.fn()
 
-    const user = ctx.fixtures.generateUser()
+    const user = ctx.fixtures.generateUser<UserEntity>()
 
     vi.spyOn(userService, 'deleteUser').mockReturnValue(Promise.resolve(user))
 
@@ -125,7 +125,7 @@ describe('userController', () => {
     const res = mockHttp.createResponse()
     const next = vi.fn()
 
-    const users = Array.from({ length: 20 }).map(() => ctx.fixtures.generateUser())
+    const users = Array.from({ length: 20 }).map(() => ctx.fixtures.generateUser<UserEntity>())
 
     vi.spyOn(userService, 'addUserList').mockReturnValue(Promise.resolve(users))
 

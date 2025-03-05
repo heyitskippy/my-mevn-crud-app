@@ -1,7 +1,15 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["client/src/**/*", "client/src/**/*.vue", "types/*", "env.d.ts", "vite-types.d.ts"],
-  "exclude": ["client/src/tests/*", "client/src/**/__tests__/*", "types/__tests__/*"],
+  "include": [
+    "client/src/**/*",
+    "client/src/**/*.vue",
+    "helpers/*",
+    "tests/*",
+    "types/*",
+    "env.d.ts",
+    "vite-types.d.ts"
+  ],
+  "exclude": ["client/src/tests/*", "client/src/**/__tests__/*", "helpers/__tests__/*"],
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "lib": ["ESNext", "DOM"],

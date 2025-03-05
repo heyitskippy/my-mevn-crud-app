@@ -4,7 +4,7 @@
     "server/**/__tests__/*",
     "server/tests/*",
     "server/tests/setup/*",
-    "types/__tests__/*",
+    "helpers/__tests__/*",
     "env.d.ts",
     "vite-types.d.ts"
   ],

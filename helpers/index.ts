@@ -1,5 +1,3 @@
-import { isObject } from '_/types/utilities'
-
 export function mergeDeep<T = unknown>(target: T, ...sources: unknown[]): T {
   if (!sources.length) return target
 
@@ -21,23 +19,25 @@ export function mergeDeep<T = unknown>(target: T, ...sources: unknown[]): T {
 
   return mergeDeep(target, ...sources)
 }
-
-export function deleteDeep(target: object, modelOrKeys: object, deep?: boolean) {
-  const model = Array.isArray(modelOrKeys)
-    ? modelOrKeys.reduce((model, key) => {
-        model[key] = null
-
-        return model
-      }, {})
-    : modelOrKeys
+/**
+ * @param target - where to delete props
+ * @param model - the object whose keys should remain in the target
+ * @param deep - enables recursive deletion (only nested objects, not arrays)
+ */
+export function deleteByModelKeys(target: object, model: object, deep?: boolean) {
+  if (Array.isArray(target)) return
 
   for (const key in target) {
     const k = key as keyof typeof target
 
     if (!Object.hasOwn(model, k)) {
       delete target[k]
-    } else if (deep && isObject(model[k])) {
-      deleteDeep(target[k], model[k])
+    } else if (deep && isObject(target[k])) {
+      if (!isObject(model[k])) {
+        target[k] = (Array.isArray(target[k]) ? [] : {}) as never
+      } else if (!Array.isArray(target[k])) {
+        deleteByModelKeys(target[k], model[k], deep)
+      }
     }
   }
 }
@@ -50,4 +50,16 @@ export function cloneDeep<T = unknown>(value: T): T {
   }
 
   return structuredClone(value)
+}
+
+export function isEmpty(value: unknown) {
+  return isObject(value) && Object.keys(value).length === 0
+}
+
+export function isObject(value: unknown) {
+  return value !== null && typeof value === 'object'
+}
+
+export function isNonNullable<T>(value: unknown): value is NonNullable<T> {
+  return value !== null && value !== undefined
 }
