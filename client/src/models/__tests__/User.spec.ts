@@ -131,7 +131,7 @@ describe('User class', () => {
     const users = Array.from({ length: 3 }).map((_, index) =>
       ctx.fixtures.generateUser({ id: String(index) }),
     )
-    const map = User.prepareCollection<NullableMockUser, User>(users, (entity) => new User(entity))
+    const map = User.prepareCollection(users)
 
     expect(map.get(users[0].id)).toBeInstanceOf(User)
 

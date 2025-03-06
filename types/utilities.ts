@@ -1,4 +1,5 @@
-import type { Maybe } from '.'
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+import type { IModel, Maybe, ID } from '.'
 
 export type MakeMaybe<T, K extends keyof T = keyof T> = Omit<T, K> & {
   [SubKey in K]: Maybe<T[SubKey]>
@@ -15,3 +16,7 @@ export type PartialDeep<T> = T extends object
       [P in keyof T]?: PartialDeep<T[P]>
     }
   : T
+
+export type TMap<M extends IModel> = Map<Maybe<ID>, M>
+
+export type Constructor<T, A extends unknown[] = any[]> = new (...args: A) => T

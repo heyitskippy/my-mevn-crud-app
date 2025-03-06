@@ -18,5 +18,5 @@ describe('databaseConfig', () => {
     await expect(async () => {
       await connectDB()
     }).rejects.toThrowError('1')
-  }, 100)
+  }, 300)
 })

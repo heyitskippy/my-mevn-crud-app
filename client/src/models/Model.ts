@@ -82,18 +82,4 @@ export default abstract class Model<T extends NullableEntity> {
   checkIfDirty(entity: Partial<T>) {
     return !isEqual(this.snapshot, entity)
   }
-
-  static prepareCollection<T extends NullableEntity, M extends Model<T> = Model<T>>(
-    collection: Partial<T>[],
-    fn: (value: Partial<T>) => M,
-    targetMap: Map<M['id'], M> = new Map(),
-  ) {
-    collection.forEach((entity) => {
-      const model = fn(entity)
-
-      targetMap.set(model.id, model)
-    })
-
-    return targetMap
-  }
 }

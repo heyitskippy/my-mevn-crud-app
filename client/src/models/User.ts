@@ -1,4 +1,7 @@
 import type { NullableUserEntity } from '_/types/users'
+import type { TMap } from '_/types/utilities'
+
+import { prepareCollection } from '_/helpers'
 
 import Model from './Model'
 
@@ -48,5 +51,12 @@ export default class User extends Model<NullableUserEntity> implements NullableU
     this.updatedAt = entity.updatedAt
 
     return entity
+  }
+
+  static prepareCollection(
+    collection: Partial<NullableUserEntity>[],
+    targetMap: TMap<User> = new Map(),
+  ) {
+    return prepareCollection<NullableUserEntity, User>(collection, targetMap, User)
   }
 }

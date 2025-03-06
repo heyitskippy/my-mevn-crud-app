@@ -4,8 +4,8 @@ import type { Params } from '_/types/api'
 import { isEmpty } from 'lodash-es'
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
-type BodyInit = FormData | URLSearchParams | string
-type OptionInit = { method: Method; body?: BodyInit }
+type BodyInit = FormData | URLSearchParams | string | object
+type OptionInit = { method: Method; body?: FormData | URLSearchParams | string }
 
 const IS_DEV = import.meta.env.DEV
 const API_URL = import.meta.env.VITE_API
@@ -24,7 +24,9 @@ export class API {
     else {
       if (p) input = `${input}?${p}`
 
-      init.body = typeof body === typeof FormData ? body : JSON.stringify(body)
+      const b = body instanceof FormData ? body : JSON.stringify(body)
+
+      init.body = b
     }
 
     return { input, init }

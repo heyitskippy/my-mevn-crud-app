@@ -1,3 +1,6 @@
+import type { IModel, NullableEntity } from '_/types'
+import type { Constructor, TMap } from '_/types/utilities'
+
 export function mergeDeep<T = unknown>(target: T, ...sources: unknown[]): T {
   if (!sources.length) return target
 
@@ -50,6 +53,20 @@ export function cloneDeep<T = unknown>(value: T): T {
   }
 
   return structuredClone(value)
+}
+
+export function prepareCollection<T extends NullableEntity, M extends IModel>(
+  collection: Partial<T>[],
+  targetMap: TMap<M>,
+  Class: Constructor<M, [Partial<T>]>,
+) {
+  collection.forEach((entity) => {
+    const model = new Class(entity)
+
+    targetMap.set(model.id, model)
+  })
+
+  return targetMap
 }
 
 export function isEmpty(value: unknown) {
