@@ -3,6 +3,7 @@
 
 :root {
   --header-height: calc(var(--spacing) * 16);
+  --progress-color: var(--color-pink-600);
 }
 
 @theme {

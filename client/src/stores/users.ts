@@ -94,6 +94,20 @@ export const useUsersStore = defineStore(resource, () => {
     return getItem(id)
   }
 
+  async function deleteItem(id: ID) {
+    singleItemIsLoading.value = true
+
+    try {
+      const data = await api.delete<{ [key]: ServerEntity }>(`/${resource}/${id}`)
+
+      removeItem(data[key].id)
+    } catch (e) {
+      console.error('[deleteItem]', resource, e)
+    } finally {
+      singleItemIsLoading.value = false
+    }
+  }
+
   async function getItemById(id: Maybe<ID>) {
     if (hasItem(id)) return getItem(id)
     if (id !== null) return fetchItemById(id)
@@ -121,6 +135,10 @@ export const useUsersStore = defineStore(resource, () => {
     return items.value.set(item.id, new Model(item))
   }
 
+  function removeItem(id: Maybe<ID>) {
+    return items.value.delete(id)
+  }
+
   return {
     users: items,
 
@@ -134,6 +152,7 @@ export const useUsersStore = defineStore(resource, () => {
 
     addUser: addItem,
     updateUser: updateItem,
+    deleteUser: deleteItem,
 
     getUserById: getItemById,
   }

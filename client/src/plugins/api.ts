@@ -11,7 +11,7 @@ const IS_DEV = import.meta.env.DEV
 const API_URL = import.meta.env.VITE_API
 
 export class API {
-  readonly #fetch = fetch
+  readonly #fetch = window.fetch.bind(window)
 
   #getOptions<P extends Params>(url: string, method: Method, body?: BodyInit, params?: P) {
     const init: OptionInit = {
