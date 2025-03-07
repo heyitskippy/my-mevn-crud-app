@@ -14,4 +14,14 @@ export const USER_HEADERS: TableHeader<Partial<NullableUserEntity>>[] = [
     headerName: 'Role',
     field: 'role',
   },
+  {
+    headerName: 'Created at',
+    field: 'createdAt',
+    type: 'datetime',
+  },
+  {
+    headerName: 'Updated at',
+    field: 'updatedAt',
+    type: 'datetime',
+  },
 ]

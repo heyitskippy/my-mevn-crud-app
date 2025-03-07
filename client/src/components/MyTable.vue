@@ -1,11 +1,15 @@
 <script setup lang="ts" generic="T extends IModel | NullableEntity | object">
-import type { IModel, NullableEntity } from '_/types'
+import type { ID, IModel, Maybe, NullableEntity } from '_/types'
 import type { TableHeader } from '_/types/ui'
+import type { TMap } from '_/types/utilities'
+
+import { prepareDateTime } from '_/helpers'
 
 const props = defineProps<{
   headers: TableHeader<T>[]
-  items: T[]
-  actions?: boolean
+  items: T[] | TMap<T>
+  showRowNumber?: boolean
+  showActions?: boolean
 }>()
 
 const POSITIONS: Record<NonNullable<TableHeader['position']>, string> = {
@@ -14,9 +18,19 @@ const POSITIONS: Record<NonNullable<TableHeader['position']>, string> = {
   end: 'text-right',
 }
 
-const getKey = (item: T) => {
+const getKey = (item: T | [Maybe<ID>, T]) => {
+  if (Array.isArray(item)) item = item[1]
+
   if ('key' in item) return item.key
   else if ('id' in item) return String(item.id)
+
+  return undefined
+}
+
+const getField = (item: T | [Maybe<ID>, T], key: TableHeader<T>['field']) => {
+  if (!Array.isArray(item) && key in item) return item[key]
+
+  if (Array.isArray(item) && key in item[1]) return item[1][key]
 
   return undefined
 }
@@ -26,6 +40,8 @@ const getKey = (item: T) => {
   <div class="my-table">
     <div class="my-table-header-group">
       <div class="table-row">
+        <div v-if="props.showRowNumber" class="my-table-cell px-4 py-3" />
+
         <div
           v-for="header in props.headers"
           :key="`h-${String(header.field)}`"
@@ -35,7 +51,7 @@ const getKey = (item: T) => {
           {{ header.headerName }}
         </div>
 
-        <div v-if="props.actions" class="my-table-cell px-4 py-3" />
+        <div v-if="props.showActions" class="my-table-cell px-4 py-3" />
       </div>
     </div>
     <div class="table-row-group">
@@ -45,17 +61,33 @@ const getKey = (item: T) => {
         class="table-row group cursor-pointer shadow-blue-50 outline-gray-200 transition-shadow hover:relative hover:z-30 hover:shadow-lg hover:outline-1 active:outline-blue-200 active:shadow-blue-100"
       >
         <div
+          v-if="props.showRowNumber"
+          class="my-table-cell text-sm px-4 py-2 bg-white"
+          :class="POSITIONS['start']"
+        >
+          {{ index + 1 }}
+        </div>
+
+        <div
           v-for="header in props.headers"
           :key="`r-${index}-c-${String(header.field)}`"
           class="my-table-cell px-4 py-2 bg-white"
           data-test="cell"
           :class="POSITIONS[header?.position ?? 'start']"
         >
-          <slot :name="header.field" :item="item">{{ item[header.field] }}</slot>
+          <slot :name="header.field" :item="item">
+            <template v-if="header.type === 'datetime'">
+              {{ prepareDateTime(getField(item, header.field)) }}
+            </template>
+
+            <template v-else>
+              {{ getField(item, header.field) }}
+            </template>
+          </slot>
         </div>
 
         <div
-          v-if="props.actions"
+          v-if="props.showActions"
           class="my-table-cell px-4 py-2 bg-white"
           :class="POSITIONS['end']"
         >

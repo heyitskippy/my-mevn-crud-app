@@ -1,4 +1,4 @@
-import type { IModel, NullableEntity } from '_/types'
+import type { IModel, Maybe, NullableEntity } from '_/types'
 import type { Constructor, TMap } from '_/types/utilities'
 
 export function mergeDeep<T = unknown>(target: T, ...sources: unknown[]): T {
@@ -67,6 +67,26 @@ export function prepareCollection<T extends NullableEntity, M extends IModel>(
   })
 
   return targetMap
+}
+
+export function prepareDateTime(
+  date?: unknown,
+  dateStyle: 'short' | 'full' | 'long' | 'medium' = 'short',
+  timeStyle: 'short' | 'full' | 'long' | 'medium' = 'short',
+  options?: Intl.DateTimeFormatOptions,
+): Date | string {
+  if (!isMaybeDate(date)) return ''
+
+  const opts = options ?? {
+    dateStyle,
+    timeStyle,
+  }
+
+  return new Date(date).toLocaleString('ru', opts)
+}
+
+export function isMaybeDate(value: unknown) {
+  return value instanceof Date || typeof value === 'string' || typeof value === 'number'
 }
 
 export function isEmpty(value: unknown) {

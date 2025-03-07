@@ -17,6 +17,6 @@ export type PartialDeep<T> = T extends object
     }
   : T
 
-export type TMap<M extends IModel> = Map<Maybe<ID>, M>
+export type TMap<M extends IModel | object> = Map<Maybe<ID>, M>
 
 export type Constructor<T, A extends unknown[] = any[]> = new (...args: A) => T
