@@ -12,6 +12,7 @@ const userSchema = new Schema<IUser>(
     email: {
       type: String,
       required: true,
+      immutable: true,
     },
     role: {
       type: String,

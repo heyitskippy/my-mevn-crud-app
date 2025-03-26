@@ -1,6 +1,6 @@
 import type { Entity } from '_/types'
 import type { MakeMaybe } from '_/types/utilities'
-import type { IUser, NullableUserEntity } from '_/types/users'
+import type { IUser, NullableUserEntity, UserForm } from '_/types/users'
 import { Role } from '_/types/users'
 
 import { describe, expect, it } from 'vitest'
@@ -118,13 +118,26 @@ describe('User class', () => {
     const mockUser = ctx.fixtures.generateUser(model)
     const user = new User(mockUser)
 
-    expect(user.checkIfDirty(mockUser)).toBe(false)
+    const form = User.prepareForm(mockUser)
+
+    expect(user.checkIfDirty(form)).toBe(false)
 
     const editedMockUser1 = { ...mockUser, email: darkElf.email }
     expect(user.checkIfDirty(editedMockUser1)).toBe(true)
 
     const editedMockUser2 = { ...mockUser, someField: 1 }
     expect(user.checkIfDirty(editedMockUser2)).toBe(true)
+  })
+
+  it('user.prepareForm() should return only UserForm fields', (ctx) => {
+    const mockUser = ctx.fixtures.generateUser(model)
+    const user = new User(mockUser)
+
+    const fields = user.toJSON()
+
+    const form: UserForm = { fullName: fields.fullName, email: fields.email, role: fields.role }
+
+    expect(User.prepareForm(fields)).toEqual(form)
   })
 
   it('User.prepareCollection should return a collection (Map) of Users with the same fields in the snapshots as in the params', (ctx) => {

@@ -7,7 +7,7 @@ import { mount } from '@vue/test-utils'
 
 import { USER_HEADERS } from '@/constants'
 
-import MyTable from '../MyTable.vue'
+import MyTable from '../MyTable/MyTable.vue'
 
 describe('MyTable', () => {
   const headers = USER_HEADERS

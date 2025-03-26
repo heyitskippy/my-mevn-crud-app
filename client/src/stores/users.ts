@@ -1,10 +1,10 @@
 import type { Ref } from 'vue'
 import type { ID, Maybe } from '_/types'
 import type { TMap } from '_/types/utilities'
-import type { IAPI } from '_/types/api'
 import type { NullableUserEntity } from '_/types/users'
+import type { API } from '@/plugins/api'
 
-import { inject, ref } from 'vue'
+import { inject, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 
 import User from '@/models/User'
@@ -19,9 +19,9 @@ const keyPlural = 'users'
 const resource = keyPlural
 
 export const useUsersStore = defineStore(resource, () => {
-  const api = inject('api') as IAPI
+  const api = inject('api') as API
 
-  const items = ref(new Map()) as List
+  const items = shallowRef(new Map()) as List
 
   const itemsAreLoading = ref(false)
   const singleItemIsLoading = ref(false)
@@ -130,9 +130,20 @@ export const useUsersStore = defineStore(resource, () => {
   function getItem(id: Maybe<ID>) {
     return items.value.get(id)
   }
+  /**
+   * The result is the same as using the "unshift" method of an array, but with a single item
+   */
+  function createItem(item: Partial<ServerEntity> = { id: null }) {
+    const id = item.id ?? null
 
-  function createItem(item: ServerEntity) {
-    return items.value.set(item.id, new Model(item))
+    const newItems = new Map()
+    newItems.set(id, new Model(item))
+
+    items.value.forEach((model) => newItems.set(model.id, model))
+
+    items.value = newItems
+
+    return getItem(id)
   }
 
   function removeItem(id: Maybe<ID>) {
@@ -155,5 +166,8 @@ export const useUsersStore = defineStore(resource, () => {
     deleteUser: deleteItem,
 
     getUserById: getItemById,
+
+    createUser: createItem,
+    removeUser: removeItem,
   }
 })

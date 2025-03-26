@@ -1,16 +1,25 @@
 <script setup lang="ts">
+import type { RouteMeta } from 'vue-router'
+
 import { computed } from 'vue'
 
 import routes from '@/router/routes'
 
 const menu = computed(() =>
-  routes.map((routeItem) => ({ name: routeItem.name, title: routeItem.name })),
+  routes.map(
+    (routeItem) =>
+      ({
+        name: routeItem.name,
+        title: routeItem.meta?.title ?? '',
+        hideInMenu: routeItem.meta?.hideInMenu ?? false,
+      }) satisfies Required<RouteMeta>,
+  ),
 )
 </script>
 
 <template>
   <div
-    class="sticky top-0 z-40 border border-gray-100 bg-white/70 shadow-xl shadow-blue-50 backdrop-blur-sm"
+    class="sticky top-0 z-[41] border border-gray-100 bg-white/70 shadow-xl shadow-blue-50 backdrop-blur-sm"
   >
     <header class="flex items-center max-w-7xl px-10 mx-auto">
       <router-link
@@ -22,7 +31,7 @@ const menu = computed(() =>
 
       <nav class="flex gap-4">
         <template v-for="item in menu" :key="item.name">
-          <router-link v-if="item.name !== 'home'" :to="{ name: item.name }" class="capitalize">
+          <router-link v-if="!item.hideInMenu" :to="{ name: item.name }">
             {{ item.title }}
           </router-link>
         </template>

@@ -1,15 +1,19 @@
-import type { NullableUserEntity } from '_/types/users'
+import type { NullableUserEntity, UserForm } from '_/types/users'
 import type { TMap } from '_/types/utilities'
 
-import { prepareCollection } from '_/helpers'
+import { cloneDeep, deleteByModelKeys, isEmpty, prepareCollection } from '_/helpers'
 
 import Model from './Model'
 
-export default class User extends Model<NullableUserEntity> implements NullableUserEntity {
-  constructor(entity: Partial<NullableUserEntity>) {
+export default class User
+  extends Model<NullableUserEntity, UserForm>
+  implements NullableUserEntity
+{
+  constructor(entity: Partial<NullableUserEntity> = {}) {
     super(entity)
 
     this.snapshot = this.prepare(entity)
+    this.formSnapshot = User.prepareForm(entity, undefined, true)
 
     const snapshot = this.getSnapshot()
 
@@ -28,7 +32,7 @@ export default class User extends Model<NullableUserEntity> implements NullableU
   createdAt: NullableUserEntity['createdAt']
   updatedAt: NullableUserEntity['updatedAt']
 
-  protected model = {
+  protected model: NullableUserEntity = {
     id: null,
 
     fullName: null,
@@ -38,7 +42,8 @@ export default class User extends Model<NullableUserEntity> implements NullableU
     createdAt: null,
     updatedAt: null,
   }
-  protected snapshot = this.getModel()
+  protected snapshot
+  protected formSnapshot
 
   update(value: Partial<NullableUserEntity>, force?: boolean) {
     const entity = super.update(value, force)
@@ -51,6 +56,25 @@ export default class User extends Model<NullableUserEntity> implements NullableU
     this.updatedAt = entity.updatedAt
 
     return entity
+  }
+
+  static prepareForm(
+    value: Partial<NullableUserEntity> = {},
+    form: UserForm = cloneDeep({
+      fullName: null,
+      email: null,
+      role: null,
+    }),
+    clone: boolean = false,
+  ) {
+    const cloned = clone ? cloneDeep<Partial<NullableUserEntity>>(value) : value
+
+    if (!isEmpty(cloned)) {
+      deleteByModelKeys(cloned, form, true)
+      Object.assign(form, cloned)
+    }
+
+    return form
   }
 
   static prepareCollection(

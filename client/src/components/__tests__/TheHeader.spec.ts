@@ -18,6 +18,8 @@ describe('TheHeader', async () => {
   })
 
   it('renders menu', async () => {
-    expect(wrapper.findAll('a')).toHaveLength(routes.length)
+    const filteredRoutesLength = routes.filter((route) => !route.meta.hideInMenu).length
+
+    expect(wrapper.findAll('a')).toHaveLength(filteredRoutesLength + 1)
   })
 })

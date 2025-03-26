@@ -2,7 +2,7 @@
 
 <template>
   <transition appear name="fade">
-    <h1 class="mb-10 capitalize"><slot /></h1>
+    <h1><slot /></h1>
   </transition>
 </template>
 

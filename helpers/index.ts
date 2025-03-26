@@ -1,5 +1,12 @@
-import type { IModel, Maybe, NullableEntity } from '_/types'
+import type { MaybeRefOrGetter, Reactive, ShallowReactive } from 'vue'
+
+import type { IModel, NullableEntity } from '_/types'
+import type { InputValue } from '_/types/ui'
 import type { Constructor, TMap } from '_/types/utilities'
+
+import { isReactive, toRaw, toValue } from 'vue'
+
+import Model from '@/models/Model'
 
 export function mergeDeep<T = unknown>(target: T, ...sources: unknown[]): T {
   if (!sources.length) return target
@@ -45,7 +52,11 @@ export function deleteByModelKeys(target: object, model: object, deep?: boolean)
   }
 }
 
-export function cloneDeep<T = unknown>(value: T): T {
+export function cloneDeep<T = unknown>(
+  value: MaybeRefOrGetter<T> | Reactive<T> | ShallowReactive<T> | T,
+): T {
+  value = toOriginal(value)
+
   if (!isObject(value)) return value
 
   if (!structuredClone) {
@@ -85,6 +96,15 @@ export function prepareDateTime(
   return new Date(date).toLocaleString('ru', opts)
 }
 
+export function fixTimezoneOffset(date: InputValue, backwards = false): Date {
+  if (!isNonNullable(date)) return new Date()
+
+  const offset = new Date().getTimezoneOffset() * 60 * 1000
+  const timestamp = new Date(date).getTime()
+
+  return new Date(timestamp + (backwards ? 1 : -1) * offset)
+}
+
 export function isMaybeDate(value: unknown) {
   return value instanceof Date || typeof value === 'string' || typeof value === 'number'
 }
@@ -99,4 +119,18 @@ export function isObject(value: unknown) {
 
 export function isNonNullable<T>(value: unknown): value is NonNullable<T> {
   return value !== null && value !== undefined
+}
+
+export function isModelLike(value: unknown) {
+  return value instanceof Model
+}
+
+export function toOriginal<T = unknown>(
+  value: MaybeRefOrGetter<T> | Reactive<T> | ShallowReactive<T> | T,
+) {
+  value = toValue(value)
+
+  if (isReactive(value)) return toOriginal(toRaw(value))
+
+  return value as T
 }

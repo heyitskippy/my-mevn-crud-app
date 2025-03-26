@@ -2192,12 +2192,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vueuse/router@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "@vueuse/router@npm:13.0.0"
+  dependencies:
+    "@vueuse/shared": "npm:13.0.0"
+  peerDependencies:
+    vue: ^3.5.0
+    vue-router: ^4.0.0
+  checksum: 10c0/676ac0d4c9cb04d2a20c468581fb2826ccc08ed73fca87d95b2d540fc0de1d975d5ba086eade9117544468279f14259322f673c8cf45c2d5477d588dd6618620
+  languageName: node
+  linkType: hard
+
 "@vueuse/shared@npm:12.8.2":
   version: 12.8.2
   resolution: "@vueuse/shared@npm:12.8.2"
   dependencies:
     vue: "npm:^3.5.13"
   checksum: 10c0/43a04cf44e3377ee7666787e597d45ddf83880d3e1835000201b0c471198ce83ad45e4f4a0182d68781c0a23c84a904aab253e4c6279400a235e0246b613bad2
+  languageName: node
+  linkType: hard
+
+"@vueuse/shared@npm:13.0.0":
+  version: 13.0.0
+  resolution: "@vueuse/shared@npm:13.0.0"
+  peerDependencies:
+    vue: ^3.5.0
+  checksum: 10c0/d7730ed05f90a421763f9b5e6e5ac64f0e085fade6090724f09990018106bca8dd63ed6070f2f471a472b84eaf98e0fc8307c282ec0ecb798eaf4035cb195cee
   languageName: node
   linkType: hard
 
@@ -5681,6 +5702,7 @@ __metadata:
     "@vue/tsconfig": "npm:^0.7.0"
     "@vueuse/core": "npm:^12.8.2"
     "@vueuse/integrations": "npm:^12.8.2"
+    "@vueuse/router": "npm:^13.0.0"
     body-parser: "npm:^1.20.3"
     concurrently: "npm:^9.1.2"
     cors: "npm:^2.8.5"

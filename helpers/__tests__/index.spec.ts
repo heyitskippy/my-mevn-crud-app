@@ -1,6 +1,34 @@
 import { describe, it, expect } from 'vitest'
 
-import { cloneDeep, deleteByModelKeys, isEmpty, isNonNullable } from '../'
+import User from '@/models/User'
+
+import {
+  cloneDeep,
+  deleteByModelKeys,
+  isEmpty,
+  isNonNullable,
+  fixTimezoneOffset,
+  isModelLike,
+} from '../'
+
+describe('fixTimezoneOffset', () => {
+  const date = '2025-02-26T14:31:20.451Z'
+  const fixed = fixTimezoneOffset(date)
+
+  it('should return a Date object with the time equal to the current time plus the current timezone offset (so it should be "wrong")', () => {
+    const offset = new Date().getTimezoneOffset() * 60 * 1000
+
+    const timestamp = fixed.getTime()
+    expect(new Date(timestamp + offset).toJSON()).toBe(new Date(date).toJSON())
+
+    const delta = timestamp - new Date(date).getTime()
+    expect(Math.abs(delta)).toBe(Math.abs(offset))
+  })
+
+  it('should return a "right" Date object, if it has "backwards" flag as true and a "wrong" Date as input', () => {
+    expect(fixTimezoneOffset(fixed, true).toJSON()).toBe(new Date(date).toJSON())
+  })
+})
 
 describe('cloneDeep', () => {
   it('should simply return the value if it is primitive or undefined', () => {
@@ -179,4 +207,13 @@ it('isNonNullable should return true if the value is not null or undefined, and 
   expect(isNonNullable(undefined)).toBe(false)
   expect(isNonNullable(0)).toBe(true)
   expect(isNonNullable('')).toBe(true)
+})
+
+it('isModelLike should return true if the value is an instance of the Model-like class', () => {
+  expect(isModelLike(null)).toBe(false)
+  expect(isModelLike(undefined)).toBe(false)
+  expect(isModelLike(0)).toBe(false)
+  expect(isModelLike({})).toBe(false)
+
+  expect(isModelLike(new User())).toBe(true)
 })

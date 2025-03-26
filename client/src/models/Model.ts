@@ -1,9 +1,9 @@
-import type { NullableEntity, ID, Maybe } from '_/types'
+import type { NullableEntity, ID, Maybe, EntityForm } from '_/types'
 
 import { cloneDeep, deleteByModelKeys } from '_/helpers'
 import { isEqual } from 'lodash-es'
 
-export default abstract class Model<T extends NullableEntity> {
+export default abstract class Model<T extends NullableEntity, F extends EntityForm> {
   constructor(entity: Partial<T>) {
     this.id = entity.id ?? null
   }
@@ -12,6 +12,7 @@ export default abstract class Model<T extends NullableEntity> {
 
   protected abstract model: T
   protected abstract snapshot: T
+  protected abstract formSnapshot: F
 
   id: Maybe<ID>
   isDeleted: boolean = false
@@ -50,7 +51,7 @@ export default abstract class Model<T extends NullableEntity> {
   }
 
   prepare(value: Partial<T>, model = this.getModel()) {
-    const cloned = cloneDeep(value)
+    const cloned = cloneDeep<Partial<T>>(value)
 
     deleteByModelKeys(cloned, model, true)
     Object.assign(model, cloned)
@@ -79,7 +80,7 @@ export default abstract class Model<T extends NullableEntity> {
     this.update(this.snapshot)
   }
 
-  checkIfDirty(entity: Partial<T>) {
-    return !isEqual(this.snapshot, entity)
+  checkIfDirty(form: F) {
+    return !isEqual(this.formSnapshot, form)
   }
 }
