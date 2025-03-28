@@ -35,7 +35,7 @@ export const useUsersStore = defineStore(resource, () => {
 
       Model.prepareCollection(data[keyPlural], items.value)
     } catch (e) {
-      console.error('[fetchItems]', resource, e)
+      console.error('[fetchItems]', `/${resource}/\n`, e)
     } finally {
       itemsAreLoading.value = false
     }
@@ -49,7 +49,7 @@ export const useUsersStore = defineStore(resource, () => {
 
       setItem(data[key])
     } catch (e) {
-      console.error('[fetchItemById]', resource, e)
+      console.error('[fetchItemById]', `/${resource}/\n`, e)
     } finally {
       singleItemIsLoading.value = false
     }
@@ -59,6 +59,7 @@ export const useUsersStore = defineStore(resource, () => {
 
   async function addItem(model: Model) {
     let id = model.id
+
     singleItemIsLoading.value = true
 
     try {
@@ -67,8 +68,9 @@ export const useUsersStore = defineStore(resource, () => {
       id = data[key].id
 
       setItem(data[key])
+      removeItem(null)
     } catch (e) {
-      console.error('[addItem]', resource, e)
+      console.error('[addItem]', `/${resource}/\n`, e)
     } finally {
       singleItemIsLoading.value = false
     }
@@ -86,7 +88,7 @@ export const useUsersStore = defineStore(resource, () => {
 
       setItem(data[key])
     } catch (e) {
-      console.error('[updateItem]', resource, e)
+      console.error('[updateItem]', `/${resource}/\n`, e)
     } finally {
       singleItemIsLoading.value = false
     }
@@ -102,7 +104,7 @@ export const useUsersStore = defineStore(resource, () => {
 
       removeItem(data[key].id)
     } catch (e) {
-      console.error('[deleteItem]', resource, e)
+      console.error('[deleteItem]', `/${resource}/\n`, e)
     } finally {
       singleItemIsLoading.value = false
     }

@@ -6,7 +6,7 @@ import { syncRef } from '@vueuse/shared'
 import { useNProgress } from '@vueuse/integrations/useNProgress'
 
 export const useUiStore = defineStore('ui', () => {
-  const { isLoading } = useNProgress()
+  const { isLoading } = useNProgress(undefined, { showSpinner: false })
 
   function setProgress(value: Ref | ComputedRef) {
     syncRef(value, isLoading, { direction: 'ltr' })

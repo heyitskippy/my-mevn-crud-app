@@ -7,11 +7,11 @@ export type ID = string
 
 export type IModel = Model<NullableEntity, EntityForm>
 
-export interface Entity {
+export interface Entity extends Dates {
   id: ID
 }
 
-export type EntityForm = Omit<NullableEntity, 'id' | 'createdAt'>
+export type EntityForm = Omit<NullableEntity, 'id' | 'createdAt' | 'updatedAt'>
 export type NullableEntity = MakeMaybe<Entity>
 
 export interface Dates {

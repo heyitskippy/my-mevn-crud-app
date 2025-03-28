@@ -1,7 +1,7 @@
 {
   "name": "my-mevn-crud-app",
   "author": "heyitskippy",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -26,6 +26,7 @@
     "prepare:mongo:prod": "dotenv -e .env.production -- docker compose -f server/docker-compose.yml up -d"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
     "@vueuse/core": "^12.8.2",
     "@vueuse/integrations": "^12.8.2",
     "@vueuse/router": "^13.0.0",

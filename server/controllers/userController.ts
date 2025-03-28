@@ -3,6 +3,8 @@ import type { Request, Response, NextFunction } from 'express'
 import type { ID } from '_/types'
 import type { IUser } from '_/types/users'
 
+import mongoose from 'mongoose'
+
 import userService from '~/services/userService'
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -33,7 +35,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   } catch (e: any) {
     console.error('[createUser]', e.message)
 
-    res.sendStatus(500)
+    handleError(e, res)
 
     next(e)
   }
@@ -74,7 +76,7 @@ const updateUser = async (
   } catch (e: any) {
     console.error('[updateUser]', e.message)
 
-    res.sendStatus(500)
+    handleError(e, res)
 
     next(e)
   }
@@ -125,6 +127,7 @@ const deleteAllUsers = async (req: Request, res: Response, next: NextFunction) =
     }
 
     res.status(200).json(deleteResult)
+
     next()
   } catch (e: any) {
     console.error('[deleteAllUsers]', e.message)
@@ -132,6 +135,20 @@ const deleteAllUsers = async (req: Request, res: Response, next: NextFunction) =
     res.sendStatus(500)
 
     next(e)
+  }
+}
+
+const handleError = (e: any, res: Response) => {
+  if (e instanceof mongoose.Error.ValidationError) {
+    const errors: Record<string, string> = {}
+
+    for (const key in e.errors) {
+      errors[key] = e.errors[key].message
+    }
+
+    res.status(422).json({ errors })
+  } else {
+    res.sendStatus(500)
   }
 }
 

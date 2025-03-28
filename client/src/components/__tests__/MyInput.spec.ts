@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import MyInput from '../MyInput.vue'
 
 describe('MyInput', () => {
-  it('should update "modelValue", emit "update:modelValue" event', async () => {
+  it('should update "modelValue", emit the event "update:modelValue"', async () => {
     const TEXT1 = 'test1'
     const TEXT2 = 'test2'
 

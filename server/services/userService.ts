@@ -4,7 +4,7 @@ import type { IUser, UserEntity } from '_/types/users'
 import User from '~/models/User'
 
 const fetchUsers = async (): Promise<UserEntity[]> => {
-  const users = await User.find().exec()
+  const users = await User.find().sort({ updatedAt: 'desc' }).exec()
   const mapped = users?.map((user) => user.toJSON())
 
   return mapped

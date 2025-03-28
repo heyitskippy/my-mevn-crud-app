@@ -3,11 +3,13 @@ import type { Params } from '_/types/api'
 
 import { isEmpty } from 'lodash-es'
 
-type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
-type BodyInit = FormData | URLSearchParams | string | object
-type OptionInit = { method: Method; body?: FormData | URLSearchParams | string }
+import { prettifyErrors } from '_/helpers'
 
-const IS_DEV = import.meta.env.DEV
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type Headers = Record<'Content-Type' | string, string>
+type BodyInit = FormData | URLSearchParams | string | object
+type OptionInit = { method: Method; body?: FormData | URLSearchParams | string; headers: Headers }
+
 const API_URL = import.meta.env.VITE_API
 
 export class API {
@@ -16,6 +18,7 @@ export class API {
   #getOptions<P extends Params>(url: string, method: Method, body?: BodyInit, params?: P) {
     const init: OptionInit = {
       method,
+      headers: {},
     }
     const p = !isEmpty(params) ? new URLSearchParams(params) : null
     let input = `${API_URL}${url}`
@@ -26,25 +29,29 @@ export class API {
 
       const b = body instanceof FormData ? body : JSON.stringify(body)
 
+      init.headers['Content-Type'] =
+        body instanceof FormData ? 'multipart/form-data' : 'application/json;charset=utf-8'
+
       init.body = b
     }
 
     return { input, init }
   }
 
-  #handleError(response: globalThis.Response) {
+  async #handleError(response: globalThis.Response) {
     if (response.ok) return
 
     const status = response.status
-    const defaultError = 'Неизвестная ошибка'
+    const defaultError = 'Unknown error'
 
-    const errors: Record<number, string> = {
-      404: 'Не найдено',
+    const body = await response.json()
+
+    const errors: Record<number, () => string> = {
+      404: () => 'Not found',
+      422: () => `Validation error\n${prettifyErrors(body.errors)}`,
     }
 
-    const message = `${status}: ${errors[status] ?? defaultError}`
-
-    if (IS_DEV) console.debug('[API]', message)
+    const message = `[${status}] ${errors[status]?.() ?? defaultError}`
 
     throw Error(message)
   }
@@ -53,7 +60,7 @@ export class API {
     const { input, init } = this.#getOptions<P>(url, 'GET', body, params)
     const response = await this.#fetch(input, init)
 
-    this.#handleError(response)
+    await this.#handleError(response)
 
     return (await response.json()) as Promise<R>
   }
@@ -62,7 +69,7 @@ export class API {
     const { input, init } = this.#getOptions<P>(url, 'POST', body, params)
     const response = await this.#fetch(input, init)
 
-    this.#handleError(response)
+    await this.#handleError(response)
 
     return (await response.json()) as Promise<R>
   }
@@ -71,7 +78,7 @@ export class API {
     const { input, init } = this.#getOptions<P>(url, 'PUT', body, params)
     const response = await this.#fetch(input, init)
 
-    this.#handleError(response)
+    await this.#handleError(response)
 
     return (await response.json()) as Promise<R>
   }
@@ -80,7 +87,7 @@ export class API {
     const { input, init } = this.#getOptions<P>(url, 'DELETE', undefined, params)
     const response = await this.#fetch(input, init)
 
-    this.#handleError(response)
+    await this.#handleError(response)
 
     return (await response.json()) as Promise<R>
   }

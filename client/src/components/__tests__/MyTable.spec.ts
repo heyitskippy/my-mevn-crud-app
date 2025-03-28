@@ -5,6 +5,8 @@ import type { TableCellSlots } from '_/types/ui'
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 
+import User from '@/models/User'
+
 import { USER_HEADERS } from '@/constants'
 
 import MyTable from '../MyTable/MyTable.vue'
@@ -13,27 +15,31 @@ describe('MyTable', () => {
   const headers = USER_HEADERS
 
   it('renders headers & items', async (ctx) => {
-    const items = Array.from({ length: 20 }).map<Partial<NullableUserEntity>>(() =>
-      ctx.fixtures.generateUser(),
+    const items = User.prepareCollection(
+      Array.from({ length: 20 }).map<Partial<NullableUserEntity>>((_, index) =>
+        ctx.fixtures.generateUser({ id: String(index) }),
+      ),
     )
 
-    const wrapper = mount(MyTable<Flatten<typeof items>>, {
+    const wrapper = mount(MyTable, {
       props: {
         headers,
         items,
       },
     })
 
-    const amount = items.length * headers.length
+    const amount = items.size * headers.length
     const cells = wrapper.findAll('[data-test="cell"]')
 
     expect(cells).toHaveLength(amount)
-    expect(cells[0].text()).toContain(items[0][headers[0].field])
+    expect(cells[0].text()).toContain(items.get('0')?.[headers[0].field])
   })
 
   it('renders custom slots', async (ctx) => {
-    const items = Array.from({ length: 20 }).map<Partial<NullableUserEntity>>(() =>
-      ctx.fixtures.generateUser(),
+    const items = User.prepareCollection(
+      Array.from({ length: 20 }).map<Partial<NullableUserEntity>>((_, index) =>
+        ctx.fixtures.generateUser({ id: String(index) }),
+      ),
     )
 
     const slots = headers.reduce(
@@ -55,6 +61,8 @@ describe('MyTable', () => {
     })
 
     const cells = wrapper.findAll('[data-test="cell"]')
-    expect(cells[0].text()).toContain(`${items[0][headers[0].field]} test`)
+    const field = items.get('0')?.[headers[0].field]
+
+    expect(cells[0].text()).toContain(`${field} test`)
   })
 })

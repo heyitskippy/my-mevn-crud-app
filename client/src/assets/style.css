@@ -12,10 +12,10 @@
 
 @layer components {
   h1 {
-    @apply text-9xl font-extralight text-gray-600 subpixel-antialiased drop-shadow-lg;
+    @apply bg-linear-to-r from-sky-600/70 to-gray-900/70 bg-clip-text text-9xl font-extralight tracking-tight text-transparent subpixel-antialiased;
   }
 
   a {
-    @apply text-blue-500 underline underline-offset-2 hover:no-underline;
+    @apply text-sky-500 underline underline-offset-2 hover:no-underline;
   }
 }

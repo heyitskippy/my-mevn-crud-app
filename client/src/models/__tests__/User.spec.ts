@@ -103,7 +103,7 @@ describe('User class', () => {
     const user = new User(mockUser)
 
     user.update(darkElf)
-    user.isDeleted = true
+    user.delete()
 
     expect(user.toJSON()).toEqual(darkElf)
 

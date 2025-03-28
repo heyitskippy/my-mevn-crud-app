@@ -1,14 +1,19 @@
 import type { NullableEntity, ID, Maybe, EntityForm } from '_/types'
 
-import { cloneDeep, deleteByModelKeys } from '_/helpers'
+import { shallowRef } from 'vue'
 import { isEqual } from 'lodash-es'
+
+import { cloneDeep, deleteByModelKeys } from '_/helpers'
 
 export default abstract class Model<T extends NullableEntity, F extends EntityForm> {
   constructor(entity: Partial<T>) {
     this.id = entity.id ?? null
   }
 
-  readonly key = Symbol()
+  key = shallowRef(Symbol())
+
+  abstract createdAt: NullableEntity['createdAt']
+  abstract updatedAt: NullableEntity['updatedAt']
 
   protected abstract model: T
   protected abstract snapshot: T
@@ -70,6 +75,10 @@ export default abstract class Model<T extends NullableEntity, F extends EntityFo
       this.id = entity.id ?? null
       this.snapshot = entity
     }
+    /**
+     * For re-render
+     */
+    this.key.value = Symbol()
 
     return entity
   }
@@ -78,6 +87,14 @@ export default abstract class Model<T extends NullableEntity, F extends EntityFo
     this.isDeleted = false
 
     this.update(this.snapshot)
+  }
+
+  delete() {
+    this.isDeleted = true
+    /**
+     * For re-render
+     */
+    this.key.value = Symbol()
   }
 
   checkIfDirty(form: F) {

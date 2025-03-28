@@ -21,6 +21,8 @@ export const USER_HEADERS: TableHeader<Partial<NullableUserEntity>>[] = [
   {
     headerName: 'Role',
     field: 'role',
+    type: 'select',
+    options: 'role',
   },
   {
     headerName: 'Created',
@@ -40,7 +42,8 @@ export const USER_FORM_LABELS: FormNames<UserForm> = {
   role: 'Role',
 }
 
-export const INPUT_TYPES: Record<NonNullable<TableHeader['type']>, InputTypeHTMLAttribute> = {
+export const FIELD_TYPES: Record<NonNullable<TableHeader['type']>, InputTypeHTMLAttribute> = {
   datetime: 'datetime-local',
   text: 'text',
+  select: 'select',
 }

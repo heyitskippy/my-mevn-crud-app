@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Maybe } from '_/types'
 import type { UserForm } from '_/types/users'
+import { Role } from '_/types/users'
 
 import { computed, onMounted, ref, shallowRef } from 'vue'
 
@@ -13,11 +14,14 @@ import { useUsersStore } from '@/stores/users'
 
 import User from '@/models/User'
 
-import { INPUT_TYPES, USER_FORM_LABELS, USER_HEADERS } from '@/constants'
+import { FIELD_TYPES, USER_FORM_LABELS, USER_HEADERS } from '@/constants'
+
+import { ArrowUturnLeftIcon, XCircleIcon, PencilSquareIcon } from '@heroicons/vue/16/solid'
 
 import MyHeading from '@/components/MyHeading.vue'
 import MyInput from '@/components/MyInput.vue'
 import MyBtn from '@/components/MyBtn.vue'
+import MySelect from '../components/MySelect.vue'
 
 const BACK_LINK = { name: 'users-list' }
 
@@ -46,7 +50,7 @@ onMounted(async () => {
   entity.value = (await store.getUserById(id.value)) ?? store.createUser() ?? null
 
   if (!entity.value) {
-    // goTo 404
+    // TODO: goTo 404
     return
   }
 
@@ -71,7 +75,7 @@ async function remove() {
 
   resetEntity()
 
-  entity.value.isDeleted = true
+  entity.value.delete()
 
   goBack()
 }
@@ -98,7 +102,17 @@ function goBack() {
 function getType(key: keyof UserForm) {
   const headerType = headers.find(({ field }) => field === key)?.type ?? 'text'
 
-  return INPUT_TYPES[headerType]
+  return FIELD_TYPES[headerType]
+}
+
+const options = shallowRef({
+  items: [],
+  role: Object.values(Role).map((name) => ({ id: name, name })),
+})
+
+function getOptionsKey(key: keyof UserForm) {
+  return (headers.find(({ field }) => field === key)?.options ??
+    'items') as keyof typeof options.value
 }
 
 onBeforeRouteLeave(() => queueMicrotask(update))
@@ -109,23 +123,51 @@ onBeforeRouteLeave(() => queueMicrotask(update))
     <MyHeading>{{ title }}</MyHeading>
 
     <div class="flex self-end ml-4 mb-4">
-      <MyBtn :disabled="!formIsDirty" @click="save">Save</MyBtn>
+      <MyBtn :disabled="!formIsDirty" title="Save locally" @click="save">
+        <template #prepend-icon>
+          <PencilSquareIcon />
+        </template>
 
-      <MyBtn :disabled="!formIsDirty" class="ml-2" @click="resetForm(true)">Reset</MyBtn>
+        Save
+      </MyBtn>
 
-      <MyBtn secondary class="ml-4" @click="remove">Delete</MyBtn>
+      <MyBtn :disabled="!formIsDirty" title="Reset form" class="ml-2" @click="resetForm(true)">
+        <template #prepend-icon>
+          <ArrowUturnLeftIcon />
+        </template>
+
+        Reset
+      </MyBtn>
+
+      <MyBtn secondary class="ml-4" title="Soft delete locally" @click="remove">
+        <template #prepend-icon>
+          <XCircleIcon />
+        </template>
+
+        Delete
+      </MyBtn>
     </div>
   </div>
 
   <div class="max-w-[440px] mx-auto my-4">
-    <MyInput
-      v-for="(label, key) in formLabels"
-      :key="key"
-      v-model="form[key]"
-      :name="key"
-      :label="label"
-      class="mb-3"
-      :type="getType(key)"
-    />
+    <template v-for="(label, key) in formLabels" :key="key">
+      <MyInput
+        v-if="getType(key) !== 'select'"
+        v-model="form[key]"
+        :name="key"
+        :label="label"
+        class="mb-3"
+        :type="getType(key)"
+      />
+
+      <MySelect
+        v-else
+        v-model="form[key]"
+        :options="options[getOptionsKey(key)]"
+        :name="key"
+        :label="label"
+        class="mb-3"
+      />
+    </template>
   </div>
 </template>

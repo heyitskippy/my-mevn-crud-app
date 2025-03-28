@@ -1,7 +1,7 @@
 import type { MaybeRefOrGetter, Reactive, ShallowReactive } from 'vue'
 
-import type { IModel, NullableEntity } from '_/types'
-import type { InputValue } from '_/types/ui'
+import type { ID, IModel, Maybe, NullableEntity } from '_/types'
+import type { InputValue, TableType } from '_/types/ui'
 import type { Constructor, TMap } from '_/types/utilities'
 
 import { isReactive, toRaw, toValue } from 'vue'
@@ -64,6 +64,14 @@ export function cloneDeep<T = unknown>(
   }
 
   return structuredClone(value)
+}
+
+export function getTableItem<T extends TableType>(item: T | [Maybe<ID>, T], key: keyof T | string) {
+  if (!Array.isArray(item) && key in item) return item
+
+  if (Array.isArray(item) && key in item[1]) return item[1]
+
+  return undefined
 }
 
 export function prepareCollection<T extends NullableEntity, M extends IModel>(
@@ -133,4 +141,13 @@ export function toOriginal<T = unknown>(
   if (isReactive(value)) return toOriginal(toRaw(value))
 
   return value as T
+}
+
+export function prettifyErrors(errors: object) {
+  return JSON.stringify(errors)
+    .replaceAll(',', '\n ')
+    .replaceAll('{', ' ')
+    .replaceAll('}', '')
+    .replaceAll(':"', ': ')
+    .replaceAll('"', '')
 }

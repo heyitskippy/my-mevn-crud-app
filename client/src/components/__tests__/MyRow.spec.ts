@@ -6,6 +6,8 @@ import { mount } from '@vue/test-utils'
 
 import { USER_HEADERS } from '@/constants'
 
+import User from '@/models/User'
+
 import MyRow from '../MyTable/MyRow.vue'
 
 describe('MyRow', () => {
@@ -13,7 +15,7 @@ describe('MyRow', () => {
 
   it('should render the item, show the row number and the actions cell', async (ctx) => {
     const index = 0
-    const item = ctx.fixtures.generateUser<Partial<NullableUserEntity>>()
+    const item = new User(ctx.fixtures.generateUser<Partial<NullableUserEntity>>())
 
     const wrapper = mount(MyRow<typeof item>, {
       props: {
@@ -39,12 +41,12 @@ describe('MyRow', () => {
     amount = headers.length + 2 // + numberCell & actionsCell
 
     const actionsCell = wrapper.findAll('.my-table-cell')[amount - 1]
-    expect(actionsCell.text()).toContain('actions')
+    expect(actionsCell.html()).toContain('</svg>')
   })
 
   it('should render custom slots and not show the row number', async (ctx) => {
     const index = 0
-    const item = ctx.fixtures.generateUser<Partial<NullableUserEntity>>()
+    const item = new User(ctx.fixtures.generateUser<Partial<NullableUserEntity>>())
 
     const slots = headers.reduce(
       (acc, header) => {
