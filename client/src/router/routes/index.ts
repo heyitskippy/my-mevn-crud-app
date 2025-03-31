@@ -31,4 +31,16 @@ export default [
       hideInMenu: true,
     },
   },
+  {
+    path: '/:catchAll(.*)*',
+    name: '404',
+    components: {
+      header: () => import('@/components/layout/TheHeader.vue'),
+      default: () => import('@/views/ErrorPage.vue'),
+    },
+    meta: {
+      title: 'Error 404',
+      hideInMenu: true,
+    },
+  },
 ] satisfies RouteRecordRaw[]

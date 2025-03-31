@@ -5,7 +5,7 @@ import { Role } from '_/types/users'
 
 import { computed, onMounted, ref, shallowRef } from 'vue'
 
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import { useRouteParams } from '@vueuse/router'
 
 import { storeToRefs } from 'pinia'
@@ -14,6 +14,8 @@ import { useUsersStore } from '@/stores/users'
 
 import User from '@/models/User'
 
+import { useError404 } from '@/composables/useError404'
+
 import { FIELD_TYPES, USER_FORM_LABELS, USER_HEADERS } from '@/constants'
 
 import { ArrowUturnLeftIcon, XCircleIcon, PencilSquareIcon } from '@heroicons/vue/16/solid'
@@ -21,7 +23,7 @@ import { ArrowUturnLeftIcon, XCircleIcon, PencilSquareIcon } from '@heroicons/vu
 import MyHeading from '@/components/MyHeading.vue'
 import MyInput from '@/components/MyInput.vue'
 import MyBtn from '@/components/MyBtn.vue'
-import MySelect from '../components/MySelect.vue'
+import MySelect from '@/components/MySelect.vue'
 
 const BACK_LINK = { name: 'users-list' }
 
@@ -32,7 +34,7 @@ const { userIsLoading } = storeToRefs(store)
 ui.setProgress(userIsLoading)
 
 const id = useRouteParams<string | null>('id', null)
-const entity = shallowRef<Maybe<User>>(null)
+const entity = shallowRef<Maybe<User | undefined>>(null)
 
 const title = computed(() => {
   if (!entity.value) return 'User'
@@ -46,11 +48,16 @@ const formLabels = USER_FORM_LABELS
 const form = ref<UserForm>(User.prepareForm())
 const formIsDirty = computed(() => entity.value?.checkIfDirty(form.value) ?? false)
 
+const router = useRouter()
+const route = useRoute()
+
 onMounted(async () => {
-  entity.value = (await store.getUserById(id.value)) ?? store.createUser() ?? null
+  entity.value =
+    (await store.getUserById(id.value)) ?? (id.value === null ? store.createUser() : undefined)
 
   if (!entity.value) {
-    // TODO: goTo 404
+    await useError404(route, router)
+
     return
   }
 
@@ -67,6 +74,8 @@ function resetForm(complete = false) {
 }
 
 function save() {
+  if (!formIsDirty.value) return
+
   goBack()
 }
 
@@ -94,7 +103,6 @@ function update() {
   if ((isNew && !isDirty) || (isNew && isDeleted)) store.removeUser(null)
 }
 
-const router = useRouter()
 function goBack() {
   router.push(BACK_LINK)
 }
@@ -149,7 +157,13 @@ onBeforeRouteLeave(() => queueMicrotask(update))
     </div>
   </div>
 
-  <div class="max-w-[440px] mx-auto my-4">
+  <form
+    name="user"
+    novalidate
+    class="max-w-[440px] mx-auto my-4"
+    @submit.prevent="save"
+    @keyup.enter="save"
+  >
     <template v-for="(label, key) in formLabels" :key="key">
       <MyInput
         v-if="getType(key) !== 'select'"
@@ -169,5 +183,5 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         class="mb-3"
       />
     </template>
-  </div>
+  </form>
 </template>

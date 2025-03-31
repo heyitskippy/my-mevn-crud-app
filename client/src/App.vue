@@ -7,7 +7,9 @@ useUiStore()
 </script>
 
 <template>
-  <div class="min-h-screen font-roboto text-gray-800 bg-white">
+  <div
+    class="min-h-screen font-roboto text-gray-800 bg-gradient-to-r from-50% from-white via-sky-50/70 via-80% to-100% to-amber-50/50"
+  >
     <router-view name="header" />
 
     <main

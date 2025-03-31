@@ -17,7 +17,7 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   } catch (e: any) {
     console.error('[getAllUsers]', e.message)
 
-    res.sendStatus(500)
+    handleError(e, res)
 
     next(e)
   }
@@ -53,7 +53,7 @@ const getUserById = async (req: Request<{ id: ID }>, res: Response, next: NextFu
   } catch (e: any) {
     console.error('[getUserById]', e.message)
 
-    res.sendStatus(404)
+    handleError(e, res, 404)
 
     next(e)
   }
@@ -94,7 +94,7 @@ const deleteUser = async (req: Request<{ id: ID }>, res: Response, next: NextFun
   } catch (e: any) {
     console.error('[deleteUser]', e.message)
 
-    res.sendStatus(500)
+    handleError(e, res)
 
     next(e)
   }
@@ -112,7 +112,7 @@ const createUserList = async (req: Request, res: Response, next: NextFunction) =
   } catch (e: any) {
     console.error('[createUserList]', e.message)
 
-    res.sendStatus(500)
+    handleError(e, res)
 
     next(e)
   }
@@ -132,24 +132,26 @@ const deleteAllUsers = async (req: Request, res: Response, next: NextFunction) =
   } catch (e: any) {
     console.error('[deleteAllUsers]', e.message)
 
-    res.sendStatus(500)
+    handleError(e, res)
 
     next(e)
   }
 }
 
-const handleError = (e: any, res: Response) => {
-  if (e instanceof mongoose.Error.ValidationError) {
-    const errors: Record<string, string> = {}
+const handleError = (e: any, res: Response, status = 500) => {
+  const errors: Record<string, string> = {}
 
+  if (e instanceof mongoose.Error.ValidationError) status = 422
+
+  if (e.errors) {
     for (const key in e.errors) {
       errors[key] = e.errors[key].message
     }
-
-    res.status(422).json({ errors })
   } else {
-    res.sendStatus(500)
+    errors['server'] = e.message
   }
+
+  res.status(status).json({ errors })
 }
 
 export default {
