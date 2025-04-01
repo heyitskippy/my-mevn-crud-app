@@ -90,7 +90,7 @@ async function remove(id: Maybe<ID>) {
     <MyHeading>{{ title }}</MyHeading>
 
     <div class="flex self-end ml-4 mb-4">
-      <MyBtn :link="{ name: 'users-edit' }" title="Create new user">
+      <MyBtn :link="{ name: 'users-edit' }" title="Create new user" name="create">
         <template #prepend-icon>
           <PlusCircleIcon />
         </template>
@@ -98,7 +98,13 @@ async function remove(id: Maybe<ID>) {
         Create
       </MyBtn>
 
-      <MyBtn secondary class="ml-4" title="Confirm changes: save to the server" @click="confirm">
+      <MyBtn
+        secondary
+        class="ml-4"
+        title="Confirm changes: save to the server"
+        name="confirm"
+        @click="confirm"
+      >
         <template #prepend-icon>
           <CloudArrowUpIcon />
         </template>

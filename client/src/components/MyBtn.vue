@@ -6,6 +6,9 @@ const props = defineProps<{
   secondary?: boolean
   btnIcon?: boolean
   disabled?: boolean
+  type?: string
+  form?: string
+  name?: string
 }>()
 </script>
 
@@ -24,6 +27,9 @@ const props = defineProps<{
         },
       ]"
       :disabled="props.disabled"
+      :type="props.type"
+      :form="props.form"
+      :name="props.name"
     >
       <span v-if="$slots['prepend-icon']" class="mr-2">
         <slot name="prepend-icon" />
@@ -43,60 +49,61 @@ const props = defineProps<{
 
 .my-btn {
   @apply z-10 m-1 flex cursor-pointer items-center rounded-md px-6 py-1 no-underline shadow-xl ring-3 inset-shadow-sm transition-all active:bg-white;
-}
 
-.btn-text {
-  @apply bg-linear-to-b bg-clip-text text-lg font-extrabold text-transparent subpixel-antialiased;
+  .btn-text {
+    @apply bg-linear-to-b bg-clip-text text-lg font-extrabold text-transparent subpixel-antialiased;
+  }
+
+  &.btn-icon {
+    @apply m-0 rounded-2xl p-0.5 shadow-lg ring-0;
+  }
+
+  &.icon :deep(svg) {
+    @apply size-4;
+  }
 }
 
 .primary {
   @apply bg-sky-50 shadow-sky-200 ring-sky-200 inset-shadow-sky-100 hover:shadow-sky-300/80 active:shadow-sky-300;
-}
 
-.primary .btn-text {
-  @apply from-sky-600 to-gray-900;
+  .btn-text {
+    @apply from-sky-600 to-gray-900;
+  }
+
+  &.btn-icon :deep(svg) {
+    @apply hover:text-sky-500;
+  }
+
+  &.icon :deep(svg) {
+    @apply text-sky-400;
+  }
 }
 
 .secondary {
   @apply bg-pink-50 shadow-pink-200 ring-pink-200 inset-shadow-pink-100 hover:shadow-pink-300/80 active:shadow-pink-300;
-}
 
-.secondary .btn-text {
-  @apply from-pink-600 to-gray-900;
-}
+  .btn-text {
+    @apply from-pink-600 to-gray-900;
+  }
 
-.my-btn.btn-icon {
-  @apply m-0 rounded-2xl p-0.5 shadow-lg ring-0;
-}
+  &.btn-icon :deep(svg) {
+    @apply hover:text-pink-500;
+  }
 
-.my-btn.icon :deep(svg) {
-  @apply size-4;
-}
-
-.my-btn.icon.primary :deep(svg) {
-  @apply text-sky-400;
-}
-
-.my-btn.btn-icon.primary :deep(svg) {
-  @apply hover:text-sky-500;
-}
-
-.my-btn.icon.secondary :deep(svg) {
-  @apply text-pink-400;
-}
-.my-btn.btn-icon.secondary :deep(svg) {
-  @apply hover:text-pink-500;
+  &.icon :deep(svg) {
+    @apply text-pink-400;
+  }
 }
 
 .my-btn:disabled {
   @apply cursor-not-allowed bg-gray-100 shadow-gray-200 ring-gray-200;
-}
 
-.my-btn:disabled .btn-text {
-  @apply from-gray-300 to-gray-500;
-}
+  .btn-text {
+    @apply from-gray-300 to-gray-500;
+  }
 
-.my-btn.icon:disabled :deep(svg) {
-  @apply !text-gray-500;
+  &.icon:disabled :deep(svg) {
+    @apply !text-gray-500;
+  }
 }
 </style>

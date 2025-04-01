@@ -81,11 +81,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
 </script>
 
 <template>
-  <div
-    class="table-row group cursor-pointer shadow-sky-50 outline-gray-200 transition-shadow hover:relative hover:z-30 hover:shadow-lg hover:outline-1 active:outline-sky-200 active:shadow-sky-100"
-    :class="colorClasses"
-    @click="handleRowClick"
-  >
+  <div class="table-row group" :class="colorClasses" @click="handleRowClick">
     <div
       v-if="props.showRowNumber"
       class="my-table-cell text-sm px-4 py-2"
@@ -99,6 +95,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
       :key="`r-${index}-c-${String(header.field)}`"
       class="my-table-cell px-4 py-2"
       data-test="cell"
+      :data-test-key="`r-${index}-c-${String(header.field)}`"
       :class="TABLE_POSITIONS[header?.position ?? 'start']"
     >
       <slot :name="header.field" :item="item">
@@ -114,12 +111,13 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
 
     <div v-if="props.showActions" class="my-table-cell">
       <span
-        class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 justify-end absolute bg-white/60 backdrop-blur-md p-1 rounded-2xl right-3 top-[5px]"
+        class="absolute top-[5px] right-3 flex items-center justify-end gap-1 rounded-2xl bg-white/60 p-1 opacity-0 backdrop-blur-md transition-opacity group-hover:opacity-100"
       >
         <MyBtn
           v-if="checkBtnVisibility('reset')"
           btn-icon
           title="Reset"
+          name="reset"
           @click.prevent.stop="handleBtnClick('reset')"
         >
           <ArrowUturnLeftIcon />
@@ -130,6 +128,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
           primary
           btn-icon
           title="Save to the server"
+          name="save"
           @click.prevent.stop="handleBtnClick('save')"
         >
           <CloudArrowUpIcon />
@@ -141,6 +140,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
           btn-icon
           title="Soft delete locally"
           class="ml-2"
+          name="softDelete"
           @click.prevent.stop="handleBtnClick('softDelete')"
         >
           <XMarkIcon />
@@ -152,6 +152,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
           btn-icon
           class="ml-2"
           title="Delete from the server"
+          name="delete"
           @click.prevent.stop="handleBtnClick('delete')"
         >
           <TrashIcon />
@@ -168,35 +169,39 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
   @apply table-cell border-y border-gray-200 bg-white;
 }
 
-.green {
-  @apply shadow-emerald-50 active:outline-emerald-200 active:shadow-emerald-100 outline-emerald-200;
-}
+.table-row {
+  @apply relative cursor-pointer shadow-sky-50 outline-gray-200 transition-shadow hover:z-30 hover:shadow-lg hover:outline-1 active:shadow-sky-100 active:outline-sky-200;
 
-.green .my-table-cell {
-  @apply bg-emerald-50  border-emerald-200;
-}
+  &.green {
+    @apply shadow-emerald-50 outline-emerald-200 active:shadow-emerald-100 active:outline-emerald-200;
 
-.yellow {
-  @apply shadow-amber-50 active:outline-amber-200 active:shadow-amber-100 outline-amber-200;
-}
+    .my-table-cell {
+      @apply bg-emerald-50  border-emerald-200;
+    }
+  }
 
-.yellow .my-table-cell {
-  @apply bg-amber-50  border-amber-200;
-}
+  &.yellow {
+    @apply shadow-amber-50 outline-amber-200 active:shadow-amber-100 active:outline-amber-200;
 
-.blue {
-  @apply shadow-sky-50 outline-sky-200 active:outline-sky-200 active:shadow-sky-100;
-}
+    .my-table-cell {
+      @apply bg-amber-50  border-amber-200;
+    }
+  }
 
-.blue .my-table-cell {
-  @apply bg-sky-50  border-sky-200;
-}
+  &.blue {
+    @apply shadow-sky-50 outline-sky-200 active:outline-sky-200 active:shadow-sky-100;
 
-.red {
-  @apply shadow-pink-50 active:outline-pink-200 active:shadow-pink-100 outline-pink-200;
-}
+    .my-table-cell {
+      @apply bg-sky-50  border-sky-200;
+    }
+  }
 
-.red .my-table-cell {
-  @apply bg-pink-50  border-pink-200;
+  &.red {
+    @apply shadow-pink-50 active:outline-pink-200 active:shadow-pink-100 outline-pink-200;
+
+    .my-table-cell {
+      @apply bg-pink-50 border-pink-200;
+    }
+  }
 }
 </style>

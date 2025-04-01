@@ -76,7 +76,7 @@ const getKey = (item: T | [Maybe<ID>, T]) => {
 }
 
 .my-table-header-group {
-  @apply sticky z-40 table-header-group bg-white/70 shadow-sm shadow-sky-50 backdrop-blur-sm outline-1 outline-gray-200/30;
+  @apply sticky z-40 table-header-group bg-white/70 shadow-sm shadow-sky-50 outline-1 outline-gray-200/30 backdrop-blur-sm;
 
   top: var(--header-height);
 }

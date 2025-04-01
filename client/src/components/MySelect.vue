@@ -103,20 +103,19 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
 .select-wrapper {
   @apply flex flex-col m-1;
 }
-
 .select {
   @apply flex h-10 cursor-pointer items-center justify-between rounded-md bg-white px-4 py-2 text-gray-900/80 subpixel-antialiased shadow-md shadow-sky-50 outline outline-gray-200 transition-all hover:shadow-lg hover:shadow-sky-100/80 hover:outline-sky-200 active:bg-sky-50/80 active:text-gray-900/90 active:!shadow-md active:shadow-sky-100 active:outline-3 active:outline-sky-200;
-}
 
-.select.show {
-  @apply bg-sky-50/80 text-gray-900/90 shadow-md shadow-sky-100  outline-sky-200;
+  &.show {
+    @apply bg-sky-50/80 text-gray-900/90 shadow-md shadow-sky-100  outline-sky-200;
+  }
 }
 
 .items {
-  @apply absolute top-full right-0 left-0 z-30 mt-1 max-h-[400px] w-full overflow-y-auto rounded-md shadow-lg shadow-sky-100/80 outline outline-gray-200  transition-all hover:shadow-sky-100/80 hover:outline-sky-200 active:text-gray-900/90 active:!shadow-md active:shadow-sky-100 active:outline-3 active:outline-sky-200 scroll-smooth;
-}
+  @apply absolute top-full right-0 left-0 z-30 mt-1 max-h-[400px] w-full overflow-y-auto scroll-smooth rounded-md shadow-lg shadow-sky-100/80 outline  outline-gray-200 transition-all hover:shadow-sky-100/80 hover:outline-sky-200 active:text-gray-900/90 active:!shadow-md active:shadow-sky-100 active:outline-3 active:outline-sky-200;
 
-.items div {
-  @apply bg-white flex h-10 subpixel-antialiased cursor-pointer items-center px-4 py-2 hover:bg-sky-50/80 text-gray-900/60 hover:text-sky-900/60 active:text-sky-900/80;
+  div {
+    @apply flex h-10 cursor-pointer items-center bg-white px-4 py-2 text-gray-900/60 subpixel-antialiased hover:bg-sky-50/80 hover:text-sky-900/60 active:text-sky-900/80;
+  }
 }
 </style>

@@ -131,7 +131,7 @@ onBeforeRouteLeave(() => queueMicrotask(update))
     <MyHeading>{{ title }}</MyHeading>
 
     <div class="flex self-end ml-4 mb-4">
-      <MyBtn :disabled="!formIsDirty" title="Save locally" @click="save">
+      <MyBtn :disabled="!formIsDirty" title="Save locally" type="submit" form="user" @click="save">
         <template #prepend-icon>
           <PencilSquareIcon />
         </template>
@@ -139,7 +139,14 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         Save
       </MyBtn>
 
-      <MyBtn :disabled="!formIsDirty" title="Reset form" class="ml-2" @click="resetForm(true)">
+      <MyBtn
+        form="user"
+        :disabled="!formIsDirty"
+        title="Reset form"
+        class="ml-2"
+        type="reset"
+        @click="resetForm(true)"
+      >
         <template #prepend-icon>
           <ArrowUturnLeftIcon />
         </template>
@@ -147,7 +154,7 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         Reset
       </MyBtn>
 
-      <MyBtn secondary class="ml-4" title="Soft delete locally" @click="remove">
+      <MyBtn secondary class="ml-4" title="Soft delete locally" type="button" @click="remove">
         <template #prepend-icon>
           <XCircleIcon />
         </template>
@@ -158,7 +165,7 @@ onBeforeRouteLeave(() => queueMicrotask(update))
   </div>
 
   <form
-    name="user"
+    id="user"
     novalidate
     class="max-w-[440px] mx-auto my-4"
     @submit.prevent="save"

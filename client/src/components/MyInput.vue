@@ -48,7 +48,7 @@ function prepareDateValue(date: T) {
       v-model="value"
       :name="props.name"
       :type="props.type ?? 'text'"
-      class="m-1 rounded-md px-4 py-2 text-gray-900/80 subpixel-antialiased shadow-md shadow-sky-50 outline outline-gray-200 transition-all hover:relative hover:z-30 hover:shadow-lg hover:shadow-sky-100/80 hover:outline-sky-200 focus:bg-sky-50/80 focus:text-gray-900/90 focus:!shadow-md focus:shadow-sky-100 focus:outline-3 focus:outline-sky-200 caret-sky-500"
+      class="m-1 rounded-md px-4 py-2 text-gray-900/80 subpixel-antialiased caret-sky-500 shadow-md shadow-sky-50 outline outline-gray-200 transition-all hover:relative hover:z-30 hover:shadow-lg hover:shadow-sky-100/80 hover:outline-sky-200 focus:bg-sky-50/80 focus:text-gray-900/90 focus:!shadow-md focus:shadow-sky-100 focus:outline-3 focus:outline-sky-200"
     />
   </div>
 </template>
