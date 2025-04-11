@@ -79,8 +79,24 @@ export function prepareCollection<T extends NullableEntity, M extends IModel>(
   targetMap: TMap<M>,
   Class: Constructor<M, [Partial<T>]>,
 ) {
+  const isOnlyOne = targetMap.size === 1
+  let isEmpty = targetMap.size === 0
+
   collection.forEach((entity) => {
-    const model = new Class(entity)
+    let model = new Class(entity)
+    /**
+     * To keep the edited entity, but change its position according to sorting
+     */
+    if (!isEmpty) {
+      const oldModel = targetMap.get(model.id)
+
+      if (oldModel?.isDirty() || oldModel?.isDeleted) {
+        model = oldModel
+        targetMap.delete(model.id)
+
+        if (isOnlyOne) isEmpty = true
+      }
+    }
 
     targetMap.set(model.id, model)
   })

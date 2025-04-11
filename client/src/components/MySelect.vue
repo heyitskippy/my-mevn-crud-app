@@ -19,6 +19,8 @@ const props = defineProps<{
   label?: string
 
   optionTextKey?: keyof O
+
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -39,16 +41,20 @@ const currentText = computed(
 )
 
 function handleSelect(id: V) {
+  if (props.disabled) return
+
   modelValue.value = id
   show.value = false
 }
 
 function handleSelectedClick() {
+  if (props.disabled) return
+
   show.value = !show.value
 }
 
 function init() {
-  if (!selectedRef.value || !itemsRef.value) return
+  if (!selectedRef.value || !itemsRef.value || props.disabled) return
 
   onClickOutside(itemsRef.value, (e) => {
     if (e.target === selectedRef.value || e.target === selectedRef.value?.children[0]) return
@@ -58,8 +64,6 @@ function init() {
 }
 
 const getKey = () => (props.optionTextKey ?? 'name') as keyof O
-
-// TODO: disabled
 </script>
 
 <template>
@@ -68,21 +72,35 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
       {{ props.label }}
     </label>
 
-    <select :id="props.name" v-model="modelValue" :name="props.name" class="hidden">
+    <select
+      :id="props.name"
+      v-model="modelValue"
+      :name="props.name"
+      class="hidden"
+      :disabled="props.disabled"
+    >
       <option v-for="option in options" :key="`option-${option.id}`" :value="option.id">
         {{ option[getKey()] }}
       </option>
     </select>
 
-    <div ref="selectedRef" class="select" :class="{ show }" @click.stop="handleSelectedClick">
+    <div
+      ref="selectedRef"
+      class="select"
+      :class="{ show: show && !props.disabled }"
+      :disabled="props.disabled"
+      @click.stop="handleSelectedClick"
+    >
       <div>
         {{ currentText }}
       </div>
 
-      <ChevronUpDownIcon class="size-4 text-gray-900/60 group-hover:text-sky-900/60" />
+      <ChevronUpDownIcon
+        class="size-4 text-gray-900/60 group-hover:not-[disabled='true']:text-sky-900/60"
+      />
     </div>
 
-    <div ref="itemsRef" class="items" :class="{ hidden: !show }">
+    <div ref="itemsRef" class="items" :class="{ hidden: !show || props.disabled }">
       <div
         v-for="option in options"
         :key="`item-${option.id}`"
@@ -103,11 +121,16 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
 .select-wrapper {
   @apply flex flex-col m-1;
 }
+
 .select {
-  @apply flex h-10 cursor-pointer items-center justify-between rounded-md bg-white px-4 py-2 text-gray-900/80 subpixel-antialiased shadow-md shadow-sky-50 outline outline-gray-200 transition-all hover:shadow-lg hover:shadow-sky-100/80 hover:outline-sky-200 active:bg-sky-50/80 active:text-gray-900/90 active:!shadow-md active:shadow-sky-100 active:outline-3 active:outline-sky-200;
+  @apply flex h-10 cursor-pointer items-center justify-between rounded-md bg-white px-4 py-2 text-gray-900/80 subpixel-antialiased shadow-md shadow-sky-50 outline outline-gray-200 transition-all hover:not-[disabled="true"]:shadow-lg hover:not-[disabled="true"]:shadow-sky-100/80 hover:not-[disabled="true"]:outline-sky-200 active:not-[disabled="true"]:bg-sky-50/80 active:not-[disabled="true"]:text-gray-900/90 active:not-[disabled="true"]:!shadow-md active:not-[disabled="true"]:shadow-sky-100 active:not-[disabled="true"]:outline-3 active:not-[disabled="true"]:outline-sky-200;
 
   &.show {
-    @apply bg-sky-50/80 text-gray-900/90 shadow-md shadow-sky-100  outline-sky-200;
+    @apply bg-sky-50/80 text-gray-900/90 shadow-md shadow-sky-100 outline-sky-200;
+  }
+
+  &[disabled='true'] {
+    @apply cursor-not-allowed bg-gray-100 text-gray-900/40;
   }
 }
 

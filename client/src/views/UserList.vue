@@ -50,10 +50,10 @@ async function handleItem(action: BtnAction, item: User | undefined) {
 
   if (action === 'reset') item.reset()
   if (action === 'softDelete') {
-    if (item.isNew()) usersStore.removeUser(item.id)
-    else item.delete()
-
-    rerender.iterateKey()
+    if (item.isNew()) {
+      usersStore.removeUser(item.id)
+      rerender.iterateKey()
+    } else item.delete()
   }
   if (action === 'delete') await remove(item.id)
   if (action === 'save') await save(item)

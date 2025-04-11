@@ -14,7 +14,7 @@ export default [
     name: 'users-list',
     components: {
       header: () => import('@/components/layout/TheHeader.vue'),
-      default: () => import('@/views/UserView.vue'),
+      default: () => import('@/views/UserList.vue'),
     },
     meta: {
       title: 'Users',

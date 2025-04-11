@@ -113,6 +113,16 @@ function getType(key: keyof UserForm) {
   return FIELD_TYPES[headerType]
 }
 
+function getReadonly(key: keyof UserForm) {
+  const action = entity.value?.isNew() ? 'create' : 'edit'
+  const readonly = headers.find(({ field }) => field === key)?.readonly ?? {
+    create: false,
+    edit: false,
+  }
+
+  return readonly[action]
+}
+
 const options = shallowRef({
   items: [],
   role: Object.values(Role).map((name) => ({ id: name, name })),
@@ -179,6 +189,7 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         :label="label"
         class="mb-3"
         :type="getType(key)"
+        :disabled="getReadonly(key)"
       />
 
       <MySelect
@@ -188,6 +199,7 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         :name="key"
         :label="label"
         class="mb-3"
+        :disabled="getReadonly(key)"
       />
     </template>
   </form>

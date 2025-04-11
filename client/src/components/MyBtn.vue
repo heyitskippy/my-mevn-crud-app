@@ -3,12 +3,15 @@ import type { RouteLocationRaw } from 'vue-router'
 
 const props = defineProps<{
   link?: RouteLocationRaw
+
   secondary?: boolean
   btnIcon?: boolean
-  disabled?: boolean
+
   type?: string
-  form?: string
+  disabled?: boolean
+
   name?: string
+  form?: string
 }>()
 </script>
 
@@ -99,11 +102,11 @@ const props = defineProps<{
   @apply cursor-not-allowed bg-gray-100 shadow-gray-200 ring-gray-200;
 
   .btn-text {
-    @apply from-gray-300 to-gray-500;
+    @apply from-gray-300 to-gray-900/40;
   }
 
   &.icon:disabled :deep(svg) {
-    @apply !text-gray-500;
+    @apply !text-gray-900/40;
   }
 }
 </style>

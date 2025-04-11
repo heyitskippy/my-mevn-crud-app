@@ -13,6 +13,7 @@ export const USER_HEADERS: TableHeader<Partial<NullableUserEntity>>[] = [
   {
     headerName: 'Email',
     field: 'email',
+    readonly: { edit: true },
   },
   {
     headerName: 'Full name',

@@ -7,6 +7,7 @@ export interface TableHeader<T extends Partial<NullableEntity> = Partial<Nullabl
   headerName: string
   field: keyof T
   type?: 'datetime' | 'text' | 'select'
+  readonly?: { create?: boolean; edit?: boolean }
   options?: string
   position?: 'start' | 'center' | 'end'
 }
