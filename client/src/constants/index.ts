@@ -13,7 +13,9 @@ export const USER_HEADERS: TableHeader<Partial<NullableUserEntity>>[] = [
   {
     headerName: 'Email',
     field: 'email',
+    type: 'email',
     readonly: { edit: true },
+    required: true,
   },
   {
     headerName: 'Full name',
@@ -24,6 +26,7 @@ export const USER_HEADERS: TableHeader<Partial<NullableUserEntity>>[] = [
     field: 'role',
     type: 'select',
     options: 'role',
+    required: true,
   },
   {
     headerName: 'Created',
@@ -47,4 +50,5 @@ export const FIELD_TYPES: Record<NonNullable<TableHeader['type']>, InputTypeHTML
   datetime: 'datetime-local',
   text: 'text',
   select: 'select',
+  email: 'email',
 }

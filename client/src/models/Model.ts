@@ -19,6 +19,12 @@ export default abstract class Model<T extends NullableEntity, F extends EntityFo
   protected abstract snapshot: T
   protected abstract formSnapshot: F
 
+  abstract validate(form?: Partial<F>): Record<keyof F, string | true>
+
+  isValid() {
+    return Object.entries(this.validate()).every(([, valid]) => valid === true)
+  }
+
   id: Maybe<ID>
   isDeleted: boolean = false
 

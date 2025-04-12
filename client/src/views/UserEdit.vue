@@ -21,9 +21,13 @@ import { FIELD_TYPES, USER_FORM_LABELS, USER_HEADERS } from '@/constants'
 import { ArrowUturnLeftIcon, XCircleIcon, PencilSquareIcon } from '@heroicons/vue/16/solid'
 
 import MyHeading from '@/components/MyHeading.vue'
-import MyInput from '@/components/MyInput.vue'
 import MyBtn from '@/components/MyBtn.vue'
+import MyInput from '@/components/MyInput.vue'
 import MySelect from '@/components/MySelect.vue'
+
+type Form = UserForm
+
+class Model extends User {}
 
 const BACK_LINK = { name: 'users-list' }
 
@@ -34,7 +38,7 @@ const { userIsLoading } = storeToRefs(store)
 ui.setProgress(userIsLoading)
 
 const id = useRouteParams<string | null>('id', null)
-const entity = shallowRef<Maybe<User | undefined>>(null)
+const entity = shallowRef<Maybe<Model | undefined>>(null)
 
 const title = computed(() => {
   if (!entity.value) return 'User'
@@ -45,8 +49,14 @@ const title = computed(() => {
 const headers = USER_HEADERS
 const formLabels = USER_FORM_LABELS
 
-const form = ref<UserForm>(User.prepareForm())
+const form = ref<Form>(Model.prepareForm())
 const formIsDirty = computed(() => entity.value?.checkIfDirty(form.value) ?? false)
+
+const validation = computed<Partial<Record<keyof Form, true | string>>>(() => {
+  if (!formIsDirty.value) return {}
+
+  return entity.value?.validate(form.value) ?? {}
+})
 
 const router = useRouter()
 const route = useRoute()
@@ -70,7 +80,7 @@ onMounted(async () => {
 function resetForm(complete = false) {
   if (complete) resetEntity()
 
-  User.prepareForm(entity.value?.toJSON(), form.value)
+  Model.prepareForm(entity.value?.toJSON(), form.value)
 }
 
 function save() {
@@ -107,13 +117,13 @@ function goBack() {
   router.push(BACK_LINK)
 }
 
-function getType(key: keyof UserForm) {
+function getType(key: keyof Form) {
   const headerType = headers.find(({ field }) => field === key)?.type ?? 'text'
 
   return FIELD_TYPES[headerType]
 }
 
-function getReadonly(key: keyof UserForm) {
+function getReadonly(key: keyof Form) {
   const action = entity.value?.isNew() ? 'create' : 'edit'
   const readonly = headers.find(({ field }) => field === key)?.readonly ?? {
     create: false,
@@ -123,12 +133,16 @@ function getReadonly(key: keyof UserForm) {
   return readonly[action]
 }
 
+function getRequired(key: keyof Form) {
+  return headers.find(({ field }) => field === key)?.required ?? false
+}
+
 const options = shallowRef({
   items: [],
   role: Object.values(Role).map((name) => ({ id: name, name })),
 })
 
-function getOptionsKey(key: keyof UserForm) {
+function getOptionsKey(key: keyof Form) {
   return (headers.find(({ field }) => field === key)?.options ??
     'items') as keyof typeof options.value
 }
@@ -187,9 +201,10 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         v-model="form[key]"
         :name="key"
         :label="label"
-        class="mb-3"
         :type="getType(key)"
         :disabled="getReadonly(key)"
+        :required="getRequired(key)"
+        :validation="validation[key]"
       />
 
       <MySelect
@@ -198,8 +213,9 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         :options="options[getOptionsKey(key)]"
         :name="key"
         :label="label"
-        class="mb-3"
         :disabled="getReadonly(key)"
+        :required="getRequired(key)"
+        :validation="validation[key]"
       />
     </template>
   </form>

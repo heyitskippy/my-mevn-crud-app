@@ -66,7 +66,9 @@ async function confirm() {
 
   users.value.forEach((user) => {
     if (user.isDeleted) promises.push(handleItem('delete', user))
-    else if (user.isNew() || user.isDirty()) promises.push(handleItem('save', user))
+    else if (user.isValid() && (user.isNew() || user.isDirty())) {
+      promises.push(handleItem('save', user))
+    }
   })
 
   await Promise.allSettled(promises)

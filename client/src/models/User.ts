@@ -2,6 +2,7 @@ import type { NullableUserEntity, UserForm } from '_/types/users'
 import type { TMap } from '_/types/utilities'
 
 import { cloneDeep, deleteByModelKeys, isEmpty, prepareCollection } from '_/helpers'
+import { checkEmail, checkFullName, checkEmptiness } from '_/helpers/validation'
 
 import Model from './Model'
 
@@ -44,6 +45,14 @@ export default class User
   }
   protected snapshot
   protected formSnapshot
+
+  validate(form: Partial<UserForm> = this.toJSON()): Record<keyof UserForm, true | string> {
+    return {
+      fullName: checkFullName(form.fullName),
+      email: checkEmail(form.email),
+      role: checkEmptiness(form.role) || 'The role cannot be empty!',
+    }
+  }
 
   update(value: Partial<NullableUserEntity>, force?: boolean) {
     const entity = super.update(value, force)

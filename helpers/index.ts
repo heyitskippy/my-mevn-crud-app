@@ -133,6 +133,10 @@ export function isMaybeDate(value: unknown) {
   return value instanceof Date || typeof value === 'string' || typeof value === 'number'
 }
 
+export function isNumber(value: unknown): value is number {
+  return Number.isFinite(value)
+}
+
 export function isEmpty(value: unknown) {
   return isObject(value) && Object.keys(value).length === 0
 }

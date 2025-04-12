@@ -6,8 +6,9 @@ import type { Flatten } from '../utilities'
 export interface TableHeader<T extends Partial<NullableEntity> = Partial<NullableEntity>> {
   headerName: string
   field: keyof T
-  type?: 'datetime' | 'text' | 'select'
+  type?: 'datetime' | 'text' | 'select' | 'email'
   readonly?: { create?: boolean; edit?: boolean }
+  required?: boolean
   options?: string
   position?: 'start' | 'center' | 'end'
 }

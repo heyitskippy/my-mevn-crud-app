@@ -9,7 +9,13 @@ import { isModelLike, prepareDateTime } from '_/helpers'
 
 import { TABLE_POSITIONS } from '@/constants'
 
-import { CloudArrowUpIcon, ArrowUturnLeftIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/16/solid'
+import {
+  CloudArrowUpIcon,
+  ArrowUturnLeftIcon,
+  TrashIcon,
+  XMarkIcon,
+  ExclamationCircleIcon,
+} from '@heroicons/vue/16/solid'
 
 import MyBtn from '@/components/MyBtn.vue'
 
@@ -30,14 +36,22 @@ const emit = defineEmits<{
   handleItem: [action: BtnAction, item: T | undefined]
 }>()
 
+const valid = computed(() => {
+  if (!isModelLike(props.item)) return true
+
+  return props.item.isValid()
+})
+
 const colorClasses = computed(() => {
   const classes: string[] = []
 
   if (!isModelLike(props.item)) return classes
 
-  if (getField<boolean>('isDeleted')) classes.push('red')
   if (props.item.isNew()) classes.push('blue')
   if (props.item.isDirty()) classes.push('yellow')
+  if (getField<boolean>('isDeleted')) classes.push('red')
+
+  if (!valid.value && !props.item.isNew()) classes.push('error')
 
   if (props.item.updatedAt) {
     const now = new Date().getTime()
@@ -54,7 +68,10 @@ function checkBtnVisibility(btn: BtnAction) {
   if (!isModelLike(item)) return true
 
   const btnVisibility: Record<BtnAction, () => boolean> = {
-    save: () => (item.isNew() || (!item.isNew() && item.isDirty())) && !getField('isDeleted'),
+    save: () =>
+      (item.isNew() || (!item.isNew() && item.isDirty())) &&
+      !getField('isDeleted') &&
+      Object.entries(item.validate() ?? {}).every(([, valid]) => valid === true),
     reset: () => getField('isDeleted') || (!item.isNew() && item.isDirty()),
     softDelete: () => !getField('isDeleted'),
     delete: () => !!getField('isDeleted'),
@@ -88,6 +105,10 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
       :class="TABLE_POSITIONS['start']"
     >
       {{ index + 1 }}
+      <ExclamationCircleIcon
+        v-if="!valid && !getField('isDeleted')"
+        class="absolute top-2 left-6 size-4 text-rose-500"
+      />
     </div>
 
     <div
@@ -139,7 +160,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
           secondary
           btn-icon
           title="Soft delete locally"
-          class="ml-2"
+          :class="{ 'ml-2': valid }"
           name="softDelete"
           @click.prevent.stop="handleBtnClick('softDelete')"
         >
@@ -193,6 +214,14 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
 
     .my-table-cell {
       @apply bg-sky-50  border-sky-200;
+    }
+  }
+
+  &.error {
+    @apply shadow-rose-50 active:outline-rose-200 active:shadow-rose-100 outline-rose-200;
+
+    .my-table-cell {
+      @apply bg-rose-50 border-rose-200;
     }
   }
 

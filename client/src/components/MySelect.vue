@@ -21,6 +21,9 @@ const props = defineProps<{
   optionTextKey?: keyof O
 
   disabled?: boolean
+  required?: boolean
+
+  validation?: string | true
 }>()
 
 const emit = defineEmits<{
@@ -28,6 +31,8 @@ const emit = defineEmits<{
 }>()
 
 const modelValue: WritableComputedRef<V> = useVModel(props, 'modelValue', emit)
+
+const error = computed(() => (props.validation === true ? '' : props.validation))
 
 const selectedRef: RefComponent<typeof HTMLDivElement> = ref(null)
 const itemsRef: RefComponent<typeof HTMLDivElement> = ref(null)
@@ -67,9 +72,9 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
 </script>
 
 <template>
-  <div class="select-wrapper relative group">
+  <div class="select-wrapper group" :class="{ error }">
     <label v-if="props.label" :for="props.name" class="mb-1 subpixel-antialiased text-gray-900/60">
-      {{ props.label }}
+      {{ props.label }}<span v-if="props.required" class="align-top text-pink-600">*</span>
     </label>
 
     <select
@@ -78,6 +83,7 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
       :name="props.name"
       class="hidden"
       :disabled="props.disabled"
+      :required="props.required"
     >
       <option v-for="option in options" :key="`option-${option.id}`" :value="option.id">
         {{ option[getKey()] }}
@@ -100,6 +106,13 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
       />
     </div>
 
+    <div
+      v-if="error"
+      class="absolute whitespace-nowrap w-full -bottom-5 text-xs text-pink-600 text-right"
+    >
+      {{ error }}
+    </div>
+
     <div ref="itemsRef" class="items" :class="{ hidden: !show || props.disabled }">
       <div
         v-for="option in options"
@@ -119,7 +132,7 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
 @reference "@/assets/style.css";
 
 .select-wrapper {
-  @apply flex flex-col m-1;
+  @apply relative m-1 mb-5 flex flex-col;
 }
 
 .select {
@@ -134,11 +147,21 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
   }
 }
 
+.select-wrapper.error {
+  label {
+    @apply text-pink-900/60;
+  }
+
+  .select {
+    @apply outline-pink-200;
+  }
+}
+
 .items {
-  @apply absolute top-full right-0 left-0 z-30 mt-1 max-h-[400px] w-full overflow-y-auto scroll-smooth rounded-md shadow-lg shadow-sky-100/80 outline  outline-gray-200 transition-all hover:shadow-sky-100/80 hover:outline-sky-200 active:text-gray-900/90 active:!shadow-md active:shadow-sky-100 active:outline-3 active:outline-sky-200;
+  @apply absolute top-full right-0 left-0 z-30 mt-1 max-h-[400px] w-full overflow-y-auto scroll-smooth rounded-md shadow-lg shadow-sky-100/80 outline outline-gray-200 transition-all hover:shadow-sky-100/80 hover:outline-sky-200 active:text-gray-900/90 active:!shadow-md active:shadow-sky-100 active:outline-3 active:outline-sky-200;
 
   div {
-    @apply flex h-10 cursor-pointer items-center bg-white px-4 py-2 text-gray-900/60 subpixel-antialiased hover:bg-sky-50/80 hover:text-sky-900/60 active:text-sky-900/80;
+    @apply flex h-10 cursor-pointer items-center bg-white px-4 py-2 text-gray-900/60 subpixel-antialiased hover:bg-sky-50 hover:text-sky-900/60 active:text-sky-900/80;
   }
 }
 </style>
