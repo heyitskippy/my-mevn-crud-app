@@ -1,7 +1,7 @@
 {
   "name": "my-mevn-crud-app",
   "author": "heyitskippy",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.5.0",
+    "@pinia/testing": "^1.0.1",
     "@tailwindcss/vite": "^4.0.8",
     "@tsconfig/node22": "^22.0.0",
     "@types/body-parser": "^1",

@@ -949,6 +949,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pinia/testing@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@pinia/testing@npm:1.0.1"
+  peerDependencies:
+    pinia: ">=3.0.2"
+  checksum: 10c0/3671e4e0edc65ca5eefe478568d3db112e83c2f08ee0d04dd670b42080f0550fe10dd5e04c154f641db27b513943c9979c7c776f73ddf9e223df4a391d2d29fa
+  languageName: node
+  linkType: hard
+
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
@@ -5752,6 +5761,7 @@ __metadata:
   dependencies:
     "@faker-js/faker": "npm:^9.5.0"
     "@heroicons/vue": "npm:^2.2.0"
+    "@pinia/testing": "npm:^1.0.1"
     "@tailwindcss/vite": "npm:^4.0.8"
     "@tsconfig/node22": "npm:^22.0.0"
     "@types/body-parser": "npm:^1"

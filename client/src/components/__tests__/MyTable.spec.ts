@@ -2,7 +2,7 @@ import type { NullableUserEntity } from '_/types/users'
 import type { Flatten } from '_/types/utilities'
 import type { TableCellSlots } from '_/types/ui'
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 
 import User from '@/models/User'
@@ -13,6 +13,8 @@ import MyTable from '../MyTable/MyTable.vue'
 
 describe('MyTable', () => {
   const headers = USER_HEADERS
+
+  vi.mock('vue-router', () => ({ onBeforeRouteLeave: vi.fn() }))
 
   it('renders headers & items', async (ctx) => {
     const items = User.prepareCollection(

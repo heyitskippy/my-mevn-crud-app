@@ -1,5 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount, RouterLinkStub } from '@vue/test-utils'
+
+import { createTestingPinia } from '@pinia/testing'
 
 import routes from '@/router/routes'
 
@@ -10,6 +12,11 @@ describe('TheHeader', async () => {
     shallow: true,
     global: {
       stubs: { 'router-link': RouterLinkStub },
+      plugins: [
+        createTestingPinia({
+          createSpy: vi.fn,
+        }),
+      ],
     },
   })
 

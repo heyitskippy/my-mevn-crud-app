@@ -1,5 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
 
+import { ref } from 'vue'
+
 import { defineStore } from 'pinia'
 
 import { syncRef } from '@vueuse/shared'
@@ -12,5 +14,7 @@ export const useUiStore = defineStore('ui', () => {
     syncRef(value, isLoading, { direction: 'ltr' })
   }
 
-  return { isLoading, setProgress }
+  const showSidebar = ref(false)
+
+  return { isLoading, setProgress, showSidebar }
 })

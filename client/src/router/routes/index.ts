@@ -14,6 +14,7 @@ export default [
     name: 'users-list',
     components: {
       header: () => import('@/components/layout/TheHeader.vue'),
+      sidebar: () => import('@/components/layout/TheSidebar.vue'),
       default: () => import('@/views/UserList.vue'),
     },
     meta: {
@@ -25,6 +26,7 @@ export default [
     name: 'users-edit',
     components: {
       header: () => import('@/components/layout/TheHeader.vue'),
+      sidebar: () => import('@/components/layout/TheSidebar.vue'),
       default: () => import('@/views/UserEdit.vue'),
     },
     meta: {
@@ -36,6 +38,7 @@ export default [
     name: '404',
     components: {
       header: () => import('@/components/layout/TheHeader.vue'),
+      sidebar: () => import('@/components/layout/TheSidebar.vue'),
       default: () => import('@/views/ErrorPage.vue'),
     },
     meta: {

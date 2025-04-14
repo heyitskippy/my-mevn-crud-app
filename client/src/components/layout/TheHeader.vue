@@ -3,7 +3,16 @@ import type { RouteMeta } from 'vue-router'
 
 import { computed } from 'vue'
 
+import { storeToRefs } from 'pinia'
+import { useUiStore } from '@/stores/ui'
+
 import routes from '@/router/routes'
+
+import MyBtn from '@/components/MyBtn.vue'
+
+import { Bars3Icon } from '@heroicons/vue/24/solid'
+
+const { showSidebar } = storeToRefs(useUiStore())
 
 const menu = computed(() =>
   routes.map(
@@ -22,6 +31,10 @@ const menu = computed(() =>
     class="sticky top-0 z-[41] border border-gray-100 bg-white/70 shadow-xl shadow-sky-50 backdrop-blur-sm"
   >
     <header class="flex items-center max-w-7xl px-5 lg:px-10 mx-auto">
+      <MyBtn btn-icon class="md:hidden mr-3" aria-label="Menu" @click="showSidebar = !showSidebar">
+        <Bars3Icon class="!size-5" />
+      </MyBtn>
+
       <router-link
         class="mr-5 lg:mr-10 block text-4xl lg:text-5xl font-extralight tracking-tight uppercase subpixel-antialiased no-underline whitespace-nowrap text-transparent bg-clip-text bg-radial-[at_50%_75%] from-sky-100 via-pink-600 to-sky-500 to-90%"
         to="/"
@@ -29,7 +42,7 @@ const menu = computed(() =>
         MY MEVN APP
       </router-link>
 
-      <nav class="flex gap-4 text-sm lg:text-base">
+      <nav class="hidden md:flex gap-4 text-sm lg:text-base">
         <template v-for="item in menu" :key="item.name">
           <router-link v-if="!item.hideInMenu" :to="{ name: item.name }">
             {{ item.title }}
