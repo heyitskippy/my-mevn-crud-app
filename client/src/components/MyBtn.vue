@@ -26,7 +26,7 @@ const props = defineProps<{
         {
           icon: props.btnIcon || $slots['prepend-icon'],
           'btn-icon': props.btnIcon,
-          '!pl-5': $slots['prepend-icon'],
+          '!pl-3 lg:!pl-5': $slots['prepend-icon'],
         },
       ]"
       :disabled="props.disabled"
@@ -51,10 +51,10 @@ const props = defineProps<{
 @reference "@/assets/style.css";
 
 .my-btn {
-  @apply z-10 m-1 flex cursor-pointer items-center rounded-md px-6 py-1 no-underline shadow-xl ring-3 inset-shadow-sm transition-all active:bg-white;
+  @apply z-10 m-1 flex cursor-pointer items-center rounded-md px-4 lg:px-6 py-0.5 lg:py-1 no-underline shadow-xl ring-3 inset-shadow-sm transition-all active:bg-white;
 
   .btn-text {
-    @apply bg-linear-to-b bg-clip-text text-lg font-extrabold text-transparent subpixel-antialiased;
+    @apply bg-linear-to-b bg-clip-text text-base lg:text-lg font-extrabold text-transparent subpixel-antialiased;
   }
 
   &.btn-icon {
@@ -62,7 +62,7 @@ const props = defineProps<{
   }
 
   &.icon :deep(svg) {
-    @apply size-4;
+    @apply size-3.5 lg:size-4;
   }
 }
 

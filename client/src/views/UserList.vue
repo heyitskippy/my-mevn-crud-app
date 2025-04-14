@@ -16,7 +16,7 @@ import { USER_HEADERS } from '@/constants'
 
 import { CloudArrowUpIcon, PlusCircleIcon } from '@heroicons/vue/16/solid'
 
-import MyHeading from '@/components/MyHeading.vue'
+import MyPageTitle from '@/components/MyPageTitle.vue'
 import MyTable from '@/components/MyTable/MyTable.vue'
 import MyBtn from '@/components/MyBtn.vue'
 
@@ -88,10 +88,12 @@ async function remove(id: Maybe<ID>) {
 </script>
 
 <template>
-  <div class="flex justify-between mb-10">
-    <MyHeading>{{ title }}</MyHeading>
+  <MyPageTitle>
+    <template #title>
+      {{ title }}
+    </template>
 
-    <div class="flex self-end ml-4 mb-4">
+    <template #actions>
       <MyBtn :link="{ name: 'users-edit' }" title="Create new user" name="create">
         <template #prepend-icon>
           <PlusCircleIcon />
@@ -102,7 +104,7 @@ async function remove(id: Maybe<ID>) {
 
       <MyBtn
         secondary
-        class="ml-4"
+        class="ml-1 lg:ml-2"
         title="Confirm changes: save to the server"
         name="confirm"
         @click="confirm"
@@ -113,8 +115,8 @@ async function remove(id: Maybe<ID>) {
 
         Confirm
       </MyBtn>
-    </div>
-  </div>
+    </template>
+  </MyPageTitle>
 
   <MyTable
     :key="rerenderKey"

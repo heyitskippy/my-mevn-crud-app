@@ -61,7 +61,7 @@ function prepareDateValue(date: T) {
 
     <div
       v-if="error"
-      class="absolute whitespace-nowrap w-full -bottom-5 text-xs text-pink-600 text-right"
+      class="absolute -bottom-4.5 w-full text-right text-xs whitespace-nowrap text-pink-600 lg:-bottom-5"
     >
       {{ error }}
     </div>
@@ -72,14 +72,14 @@ function prepareDateValue(date: T) {
 @reference "@/assets/style.css";
 
 .input-wrapper {
-  @apply relative m-1 mb-5 flex flex-col;
+  @apply relative m-1 mb-4 flex flex-col lg:mb-5;
 
   label {
-    @apply mb-1 subpixel-antialiased text-gray-900/60;
+    @apply mb-0.5 lg:mb-1 subpixel-antialiased text-gray-900/60 text-sm lg:text-base;
   }
 
   input {
-    @apply rounded-md px-4 py-2 text-gray-900/80 subpixel-antialiased caret-sky-500 shadow-md shadow-sky-50 outline outline-gray-200 transition-all hover:not-disabled:relative hover:not-disabled:z-30 hover:not-disabled:shadow-lg hover:not-disabled:shadow-sky-100/80 hover:not-disabled:outline-sky-200 focus:bg-sky-50/80 focus:text-gray-900/90 focus:!shadow-md focus:shadow-sky-100 focus:outline-3 focus:outline-sky-200;
+    @apply rounded-md px-3 py-2 text-sm text-gray-900/80 subpixel-antialiased caret-sky-500 shadow-md shadow-sky-50 outline outline-gray-200 transition-all hover:not-disabled:relative hover:not-disabled:z-30 hover:not-disabled:shadow-lg hover:not-disabled:shadow-sky-100/80 hover:not-disabled:outline-sky-200 focus:bg-sky-50/80 focus:text-gray-900/90 focus:!shadow-md focus:shadow-sky-100 focus:outline-3 focus:outline-sky-200 lg:px-4 lg:text-base;
 
     &:disabled {
       @apply cursor-not-allowed bg-gray-100 text-gray-900/40;

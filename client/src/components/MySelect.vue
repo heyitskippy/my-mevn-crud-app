@@ -73,7 +73,11 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
 
 <template>
   <div class="select-wrapper group" :class="{ error }">
-    <label v-if="props.label" :for="props.name" class="mb-1 subpixel-antialiased text-gray-900/60">
+    <label
+      v-if="props.label"
+      :for="props.name"
+      class="mb-0.5 lg:mb-1 subpixel-antialiased text-gray-900/60 text-sm lg:text-base"
+    >
       {{ props.label }}<span v-if="props.required" class="align-top text-pink-600">*</span>
     </label>
 
@@ -102,13 +106,13 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
       </div>
 
       <ChevronUpDownIcon
-        class="size-4 text-gray-900/60 group-hover:not-[disabled='true']:text-sky-900/60"
+        class="size-3.5 lg:size-4 text-gray-900/60 group-hover:not-[disabled='true']:text-sky-900/60"
       />
     </div>
 
     <div
       v-if="error"
-      class="absolute whitespace-nowrap w-full -bottom-5 text-xs text-pink-600 text-right"
+      class="absolute -bottom-4.5 w-full text-right text-xs whitespace-nowrap text-pink-600 lg:-bottom-5"
     >
       {{ error }}
     </div>
@@ -132,11 +136,11 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
 @reference "@/assets/style.css";
 
 .select-wrapper {
-  @apply relative m-1 mb-5 flex flex-col;
+  @apply relative m-1 mb-4 flex flex-col lg:mb-5;
 }
 
 .select {
-  @apply flex h-10 cursor-pointer items-center justify-between rounded-md bg-white px-4 py-2 text-gray-900/80 subpixel-antialiased shadow-md shadow-sky-50 outline outline-gray-200 transition-all hover:not-[disabled="true"]:shadow-lg hover:not-[disabled="true"]:shadow-sky-100/80 hover:not-[disabled="true"]:outline-sky-200 active:not-[disabled="true"]:bg-sky-50/80 active:not-[disabled="true"]:text-gray-900/90 active:not-[disabled="true"]:!shadow-md active:not-[disabled="true"]:shadow-sky-100 active:not-[disabled="true"]:outline-3 active:not-[disabled="true"]:outline-sky-200;
+  @apply flex h-9 cursor-pointer items-center justify-between rounded-md bg-white px-3 py-2 text-sm text-gray-900/80 subpixel-antialiased shadow-md shadow-sky-50 outline outline-gray-200 transition-all hover:not-[disabled="true"]:shadow-lg hover:not-[disabled="true"]:shadow-sky-100/80 hover:not-[disabled="true"]:outline-sky-200 active:not-[disabled="true"]:bg-sky-50/80 active:not-[disabled="true"]:text-gray-900/90 active:not-[disabled="true"]:!shadow-md active:not-[disabled="true"]:shadow-sky-100 active:not-[disabled="true"]:outline-3 active:not-[disabled="true"]:outline-sky-200 lg:h-10 lg:px-4 lg:text-base;
 
   &.show {
     @apply bg-sky-50/80 text-gray-900/90 shadow-md shadow-sky-100 outline-sky-200;
@@ -158,10 +162,10 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
 }
 
 .items {
-  @apply absolute top-full right-0 left-0 z-30 mt-1 max-h-[400px] w-full overflow-y-auto scroll-smooth rounded-md shadow-lg shadow-sky-100/80 outline outline-gray-200 transition-all hover:shadow-sky-100/80 hover:outline-sky-200 active:text-gray-900/90 active:!shadow-md active:shadow-sky-100 active:outline-3 active:outline-sky-200;
+  @apply absolute top-full right-0 left-0 z-30 mt-1 max-h-[25rem] w-full overflow-y-auto scroll-smooth rounded-md shadow-lg shadow-sky-100/80 outline outline-gray-200 transition-all hover:shadow-sky-100/80 hover:outline-sky-200 active:text-gray-900/90 active:!shadow-md active:shadow-sky-100 active:outline-3 active:outline-sky-200;
 
   div {
-    @apply flex h-10 cursor-pointer items-center bg-white px-4 py-2 text-gray-900/60 subpixel-antialiased hover:bg-sky-50 hover:text-sky-900/60 active:text-sky-900/80;
+    @apply flex h-9 cursor-pointer items-center bg-white px-3 py-2 text-sm text-gray-900/60 subpixel-antialiased hover:bg-sky-50 hover:text-sky-900/60 active:text-sky-900/80 lg:h-10 lg:px-4 lg:text-base;
   }
 }
 </style>

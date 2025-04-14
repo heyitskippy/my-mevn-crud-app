@@ -20,7 +20,7 @@ import { FIELD_TYPES, USER_FORM_LABELS, USER_HEADERS } from '@/constants'
 
 import { ArrowUturnLeftIcon, XCircleIcon, PencilSquareIcon } from '@heroicons/vue/16/solid'
 
-import MyHeading from '@/components/MyHeading.vue'
+import MyPageTitle from '@/components/MyPageTitle.vue'
 import MyBtn from '@/components/MyBtn.vue'
 import MyInput from '@/components/MyInput.vue'
 import MySelect from '@/components/MySelect.vue'
@@ -151,10 +151,12 @@ onBeforeRouteLeave(() => queueMicrotask(update))
 </script>
 
 <template>
-  <div class="flex justify-between mb-10">
-    <MyHeading>{{ title }}</MyHeading>
+  <MyPageTitle>
+    <template #title>
+      {{ title }}
+    </template>
 
-    <div class="flex self-end ml-4 mb-4">
+    <template #actions>
       <MyBtn :disabled="!formIsDirty" title="Save locally" type="submit" form="user" @click="save">
         <template #prepend-icon>
           <PencilSquareIcon />
@@ -167,7 +169,6 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         form="user"
         :disabled="!formIsDirty"
         title="Reset form"
-        class="ml-2"
         type="reset"
         @click="resetForm(true)"
       >
@@ -178,20 +179,26 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         Reset
       </MyBtn>
 
-      <MyBtn secondary class="ml-4" title="Soft delete locally" type="button" @click="remove">
+      <MyBtn
+        secondary
+        class="ml-1 lg:ml-2"
+        title="Soft delete locally"
+        type="button"
+        @click="remove"
+      >
         <template #prepend-icon>
           <XCircleIcon />
         </template>
 
         Delete
       </MyBtn>
-    </div>
-  </div>
+    </template>
+  </MyPageTitle>
 
   <form
     id="user"
     novalidate
-    class="max-w-[440px] mx-auto my-4"
+    class="max-w-lg mx-auto my-2 lg:my-4"
     @submit.prevent="save"
     @keyup.enter="save"
   >

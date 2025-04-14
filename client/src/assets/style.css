@@ -3,7 +3,8 @@
 @import 'tailwindcss';
 
 :root {
-  --header-height: calc(var(--spacing) * 16);
+  --header-height-lg: calc(var(--spacing) * 16);
+  --header-height: calc(var(--header-height-lg) - var(--spacing) * 5);
   --progress-color: var(--color-pink-600);
 }
 
@@ -13,7 +14,7 @@
 
 @layer components {
   h1 {
-    @apply bg-linear-to-r from-sky-600/70 to-gray-900/70 bg-clip-text text-9xl font-extralight tracking-tight text-transparent subpixel-antialiased;
+    @apply bg-linear-to-r from-sky-600/70 to-gray-900/70 bg-clip-text text-7xl md:text-8xl lg:text-9xl font-extralight tracking-tight text-transparent subpixel-antialiased;
   }
 
   a {

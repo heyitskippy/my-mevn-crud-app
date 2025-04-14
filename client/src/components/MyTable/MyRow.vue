@@ -98,28 +98,30 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
 </script>
 
 <template>
-  <div class="table-row group" :class="colorClasses" @click="handleRowClick">
+  <div class="my-table-row group" :class="colorClasses" @click="handleRowClick">
     <div
       v-if="props.showRowNumber"
-      class="my-table-cell text-sm px-4 py-2"
+      class="my-table-cell padded !text-sm"
       :class="TABLE_POSITIONS['start']"
     >
       {{ index + 1 }}
       <ExclamationCircleIcon
         v-if="!valid && !getField('isDeleted')"
-        class="absolute top-2 left-6 size-4 text-rose-500"
+        class="absolute top-0.5 lg:top-2 left-5 sm:left-4 lg:left-6 size-3.5 lg:size-4 text-rose-500"
       />
     </div>
 
     <div
       v-for="header in props.headers"
       :key="`r-${index}-c-${String(header.field)}`"
-      class="my-table-cell px-4 py-2"
+      class="my-table-cell padded"
       data-test="cell"
       :data-test-key="`r-${index}-c-${String(header.field)}`"
       :class="TABLE_POSITIONS[header?.position ?? 'start']"
     >
       <slot :name="header.field" :item="item">
+        <span class="sm:hidden font-bold">{{ header.headerName }}: </span>
+
         <template v-if="header.type === 'datetime'">
           {{ prepareDateTime(getField(header.field)) }}
         </template>
@@ -131,9 +133,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
     </div>
 
     <div v-if="props.showActions" class="my-table-cell">
-      <span
-        class="absolute top-[5px] right-3 flex items-center justify-end gap-1 rounded-2xl bg-white/60 p-1 opacity-0 backdrop-blur-md transition-opacity group-hover:opacity-100"
-      >
+      <span class="actions">
         <MyBtn
           v-if="checkBtnVisibility('reset')"
           btn-icon
@@ -160,7 +160,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
           secondary
           btn-icon
           title="Soft delete locally"
-          :class="{ 'ml-2': valid }"
+          :class="{ 'ml-1 lg:ml-2': valid }"
           name="softDelete"
           @click.prevent.stop="handleBtnClick('softDelete')"
         >
@@ -171,7 +171,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
           v-if="checkBtnVisibility('delete')"
           secondary
           btn-icon
-          class="ml-2"
+          class="ml-1 lg:ml-2"
           title="Delete from the server"
           name="delete"
           @click.prevent.stop="handleBtnClick('delete')"
@@ -187,14 +187,18 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
 @reference "@/assets/style.css";
 
 .my-table-cell {
-  @apply table-cell border-y border-gray-200 bg-white;
+  @apply sm:table-cell sm:border-y border-gray-200 bg-white text-sm lg:text-base;
+
+  &.padded {
+    @apply px-2 py-1 lg:px-4 lg:py-2;
+  }
 }
 
-.table-row {
-  @apply relative cursor-pointer shadow-sky-50 outline-gray-200 transition-shadow hover:z-30 hover:shadow-lg hover:outline-1 active:shadow-sky-100 active:outline-sky-200;
+.my-table-row {
+  @apply max-sm:p-1 max-sm:border border-gray-200 relative w-full cursor-pointer shadow-sky-50 outline-gray-200 transition-shadow hover:z-30 hover:shadow-lg hover:outline-1 active:shadow-sky-100 active:outline-sky-200 sm:table-row;
 
   &.green {
-    @apply shadow-emerald-50 outline-emerald-200 active:shadow-emerald-100 active:outline-emerald-200;
+    @apply max-sm:bg-emerald-50 shadow-emerald-50 outline-emerald-200 active:shadow-emerald-100 active:outline-emerald-200;
 
     .my-table-cell {
       @apply bg-emerald-50  border-emerald-200;
@@ -202,7 +206,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
   }
 
   &.yellow {
-    @apply shadow-amber-50 outline-amber-200 active:shadow-amber-100 active:outline-amber-200;
+    @apply max-sm:bg-amber-50 shadow-amber-50 outline-amber-200 active:shadow-amber-100 active:outline-amber-200;
 
     .my-table-cell {
       @apply bg-amber-50  border-amber-200;
@@ -210,7 +214,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
   }
 
   &.blue {
-    @apply shadow-sky-50 outline-sky-200 active:outline-sky-200 active:shadow-sky-100;
+    @apply max-sm:bg-sky-50 shadow-sky-50 outline-sky-200 active:outline-sky-200 active:shadow-sky-100;
 
     .my-table-cell {
       @apply bg-sky-50  border-sky-200;
@@ -218,7 +222,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
   }
 
   &.error {
-    @apply shadow-rose-50 active:outline-rose-200 active:shadow-rose-100 outline-rose-200;
+    @apply max-sm:bg-rose-50 shadow-rose-50 active:outline-rose-200 active:shadow-rose-100 outline-rose-200;
 
     .my-table-cell {
       @apply bg-rose-50 border-rose-200;
@@ -226,11 +230,15 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
   }
 
   &.red {
-    @apply shadow-pink-50 active:outline-pink-200 active:shadow-pink-100 outline-pink-200;
+    @apply max-sm:bg-pink-50 shadow-pink-50 active:outline-pink-200 active:shadow-pink-100 outline-pink-200;
 
     .my-table-cell {
       @apply bg-pink-50 border-pink-200;
     }
   }
+}
+
+.actions {
+  @apply absolute top-1.5 sm:top-[3px] right-2 lg:right-3 flex items-center justify-end gap-0.5 lg:gap-1 rounded-2xl bg-white/60 p-0.5 opacity-0 backdrop-blur-md transition-opacity group-hover:opacity-100 lg:top-[5px] lg:p-1;
 }
 </style>
