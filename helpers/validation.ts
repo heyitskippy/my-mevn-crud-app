@@ -2,12 +2,10 @@ import { isNonNullable, isNumber } from '.'
 import string from './string'
 
 export function checkFullName(fullName: unknown) {
-  let message = "Full name can't be empty!"
+  if (!isNonNullable(fullName) || !string.isString(fullName)) return true
+  if (string.isEmpty(fullName)) return true
 
-  if (!isNonNullable(fullName) || !string.isString(fullName)) return message
-  if (string.isEmpty(fullName)) return message
-
-  message = 'Full name must be longer than 3 characters!'
+  let message = 'Full name must be longer than 3 characters!'
 
   const trimmed = fullName.trim()
   if (trimmed.length <= 3) return message
@@ -18,7 +16,7 @@ export function checkFullName(fullName: unknown) {
 }
 
 export function checkEmail(email: unknown) {
-  let message = "Email can't be empty!"
+  let message = 'Email is required!'
 
   if (!isNonNullable(email) || !string.isString(email)) return message
   if (string.isEmpty(email)) return message

@@ -47,11 +47,20 @@ export default class User
   protected formSnapshot
 
   validate(form: Partial<UserForm> = this.toJSON()): Record<keyof UserForm, true | string> {
-    return {
+    const valid = {
       fullName: checkFullName(form.fullName),
       email: checkEmail(form.email),
-      role: checkEmptiness(form.role) || 'The role cannot be empty!',
+      role: checkEmptiness(form.role) || 'The role is required!',
     }
+    const errors = this.validationErrors ?? {}
+
+    Object.entries(valid).forEach(([key, value]) => {
+      const k = key as keyof UserForm
+
+      if (value === true) valid[k] = errors[k] ? `Server: ${errors[k]}` : true
+    })
+
+    return valid
   }
 
   update(value: Partial<NullableUserEntity>, force?: boolean) {

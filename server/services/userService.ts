@@ -31,7 +31,10 @@ const fetchUserById = async (id: ID): Promise<Maybe<UserEntity> | undefined> => 
 }
 
 const updateUser = async (id: ID, user: Partial<IUser>): Promise<Maybe<UserEntity> | undefined> => {
-  const updated = await User.findByIdAndUpdate(id, user, { returnDocument: 'after' }).exec()
+  const updated = await User.findByIdAndUpdate(id, user, {
+    returnDocument: 'after',
+    runValidators: true,
+  }).exec()
 
   return updated?.toJSON()
 }

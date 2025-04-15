@@ -140,8 +140,22 @@ const deleteAllUsers = async (req: Request, res: Response, next: NextFunction) =
 
 const handleError = (e: any, res: Response, status = 500) => {
   const errors: Record<string, string> = {}
+  if (e instanceof mongoose.Error.ValidationError || /duplicate key/.test(e.message)) {
+    status = 422
 
-  if (e instanceof mongoose.Error.ValidationError) status = 422
+    if (/duplicate key/.test(e.message)) {
+      const result = e.message.match(/\w+: "/g)
+      const keys = result?.map((v: string) => v.replace(': "', '') ?? [])
+
+      e.errors ??= {}
+
+      for (const index in keys) {
+        errors[keys[index]] = `This ${keys[index]} already exists!`
+      }
+
+      errors['server'] = e.message
+    }
+  }
 
   if (e.errors) {
     for (const key in e.errors) {

@@ -21,7 +21,14 @@ export default abstract class Model<T extends NullableEntity, F extends EntityFo
 
   abstract validate(form?: Partial<F>): Record<keyof F, string | true>
 
+  validationErrors: Maybe<Partial<Record<keyof F, string>>> = null
+  updateValidationErrors(errors?: Partial<Record<keyof F, string>>) {
+    this.validationErrors = errors ?? null
+  }
+
   isValid() {
+    if (this.validationErrors) return false
+
     return Object.entries(this.validate()).every(([, valid]) => valid === true)
   }
 
@@ -81,6 +88,8 @@ export default abstract class Model<T extends NullableEntity, F extends EntityFo
       this.id = entity.id ?? null
       this.snapshot = entity
     }
+
+    this.updateValidationErrors()
     /**
      * For re-render
      */

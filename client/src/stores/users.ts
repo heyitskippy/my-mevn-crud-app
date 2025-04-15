@@ -7,6 +7,8 @@ import type { API } from '@/plugins/api'
 import { inject, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 
+import { isObject } from '_/helpers'
+
 import User from '@/models/User'
 
 type List = Ref<TMap<User>>
@@ -70,6 +72,8 @@ export const useUsersStore = defineStore(resource, () => {
       setItem(data[key])
       removeItem(null)
     } catch (e) {
+      handleValidationError(e, getItem(null))
+
       console.error('[addItem]', `/${resource}/\n`, e)
     } finally {
       singleItemIsLoading.value = false
@@ -88,6 +92,8 @@ export const useUsersStore = defineStore(resource, () => {
 
       setItem(data[key])
     } catch (e) {
+      handleValidationError(e, getItem(id))
+
       console.error('[updateItem]', `/${resource}/\n`, e)
     } finally {
       singleItemIsLoading.value = false
@@ -150,6 +156,15 @@ export const useUsersStore = defineStore(resource, () => {
 
   function removeItem(id: Maybe<ID>) {
     return items.value.delete(id)
+  }
+
+  function handleValidationError(e: unknown, user: User | undefined) {
+    if (!(isObject(e) && 'cause' in e) || !user) return
+
+    const { cause } = e as { cause: { status: number; errors: object } }
+    if (cause.status !== 422) return
+
+    user.updateValidationErrors(cause.errors)
   }
 
   return {

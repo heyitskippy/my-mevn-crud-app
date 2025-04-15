@@ -53,7 +53,7 @@ export class API {
 
     const message = `[${status}] ${errors[status]?.() ?? defaultError}`
 
-    throw Error(message)
+    throw Error(message, { cause: { status, errors: body.errors ?? {} } })
   }
 
   async get<R = unknown, P extends Params = Params>(url: string, body?: BodyInit, params?: P) {
