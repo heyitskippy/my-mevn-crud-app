@@ -19,8 +19,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 const API = import.meta.env.VITE_API
 
-app.use(commonRouter)
 app.use(`${API}/users`, usersRouter)
+app.use(commonRouter)
 
 connectDB()
 

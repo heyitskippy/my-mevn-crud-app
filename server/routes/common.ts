@@ -2,8 +2,8 @@ import { Router } from 'express'
 
 const router = Router()
 
-router.get('/api', (_, res) => {
-  res.send("It's API!")
+router.get('*', function (_, res) {
+  res.status(404).json({ errors: { server: '404: not found' } })
 })
 
 export default router
