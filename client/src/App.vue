@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useUiStore } from '@/stores/ui'
+
+import MyToaster from '@/components/MyToaster/MyToaster.vue'
 /**
  * Kick-start
  */
@@ -18,5 +20,7 @@ useUiStore()
     >
       <router-view />
     </main>
+
+    <MyToaster />
   </div>
 </template>

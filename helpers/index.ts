@@ -171,3 +171,15 @@ export function prettifyErrors(errors: object) {
     .replaceAll(':"', ': ')
     .replaceAll('"', '')
 }
+
+export function timeout(ms: number) {
+  return new Promise((resolve) => {
+    const timeoutId = setTimeout(() => {
+      queueMicrotask(() => {
+        clearTimeout(timeoutId)
+      })
+
+      resolve(true)
+    }, ms)
+  })
+}

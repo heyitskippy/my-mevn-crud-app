@@ -55,7 +55,7 @@ describe('userController', () => {
   })
 
   it('getById should return user or throw an error', async (ctx) => {
-    const id = '1'
+    const id = '6802179130af1928cb41a1a2'
 
     const req = mockHttp.createRequest<Request<{ id: ID }>>({ params: { id } })
     const res = mockHttp.createResponse()

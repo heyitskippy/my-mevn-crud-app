@@ -1,11 +1,16 @@
 import type { Ref } from 'vue'
-import type { ID, Maybe } from '_/types'
-import type { TMap } from '_/types/utilities'
-import type { NullableUserEntity } from '_/types/users'
+
 import type { API } from '@/plugins/api'
 
+import type { ID, Maybe } from '_/types'
+import type { TMap } from '_/types/utilities'
+import type { ToastState } from '_/types/ui'
+import type { NullableUserEntity } from '_/types/users'
+
 import { inject, ref, shallowRef } from 'vue'
+
 import { defineStore } from 'pinia'
+import { useUiStore } from '@/stores/ui'
 
 import { isObject } from '_/helpers'
 
@@ -22,6 +27,7 @@ const resource = keyPlural
 
 export const useUsersStore = defineStore(resource, () => {
   const api = inject('api') as API
+  const ui = useUiStore()
 
   const items = shallowRef(new Map()) as List
 
@@ -60,6 +66,7 @@ export const useUsersStore = defineStore(resource, () => {
   }
 
   async function addItem(model: Model) {
+    const options: Partial<ToastState> = {}
     let id = model.id
 
     singleItemIsLoading.value = true
@@ -71,18 +78,27 @@ export const useUsersStore = defineStore(resource, () => {
 
       setItem(data[key])
       removeItem(null)
+
+      options.type = 'success'
+      options.text = 'Added successfully'
     } catch (e) {
       handleValidationError(e, getItem(null))
+
+      options.type = 'error'
+      options.text = 'Something went wrong. Failed to add'
 
       console.error('[addItem]', `/${resource}/\n`, e)
     } finally {
       singleItemIsLoading.value = false
+
+      if (options.text) ui.addToast(options)
     }
 
     return getItem(id)
   }
 
   async function updateItem(model: Model) {
+    const options: Partial<ToastState> = {}
     const id = model.id
 
     singleItemIsLoading.value = true
@@ -91,18 +107,27 @@ export const useUsersStore = defineStore(resource, () => {
       const data = await api.put<{ [key]: ServerEntity }>(`/${resource}/${id}`, model.toJSON())
 
       setItem(data[key])
+
+      options.type = 'success'
+      options.text = 'Updated successfully'
     } catch (e) {
       handleValidationError(e, getItem(id))
+
+      options.text = 'Something went wrong. Failed to save'
 
       console.error('[updateItem]', `/${resource}/\n`, e)
     } finally {
       singleItemIsLoading.value = false
+
+      if (options.text) ui.addToast(options)
     }
 
     return getItem(id)
   }
 
   async function deleteItem(id: ID) {
+    const options: Partial<ToastState> = {}
+
     singleItemIsLoading.value = true
 
     try {
@@ -110,9 +135,13 @@ export const useUsersStore = defineStore(resource, () => {
 
       removeItem(data[key].id)
     } catch (e) {
+      options.text = 'Something went wrong. Failed to delete'
+
       console.error('[deleteItem]', `/${resource}/\n`, e)
     } finally {
       singleItemIsLoading.value = false
+
+      if (options.text) ui.addToast(options)
     }
   }
 

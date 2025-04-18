@@ -45,6 +45,10 @@ const getUserById = async (req: Request<{ id: ID }>, res: Response, next: NextFu
   const { id } = req.params
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Error(`The id is not valid (${id})`)
+    }
+
     const user = await userService.fetchUserById(id)
     if (!user) throw new Error(`Can't find user with id=${id}`)
 
@@ -69,7 +73,7 @@ const updateUser = async (
 
   try {
     const updatedUser = await userService.updateUser(id, user)
-    if (!updatedUser) throw new Error(`Something went wrong while updating user  with id=${id}`)
+    if (!updatedUser) throw new Error(`Something went wrong while updating user with id=${id}`)
 
     res.status(200).json({ user: updatedUser })
     next()
@@ -140,6 +144,7 @@ const deleteAllUsers = async (req: Request, res: Response, next: NextFunction) =
 
 const handleError = (e: any, res: Response, status = 500) => {
   const errors: Record<string, string> = {}
+
   if (e instanceof mongoose.Error.ValidationError || /duplicate key/.test(e.message)) {
     status = 422
 

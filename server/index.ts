@@ -20,14 +20,15 @@ app.use(bodyParser.urlencoded({ extended: true }))
 const API = import.meta.env.VITE_API
 
 app.use(`${API}/users`, usersRouter)
-app.use(commonRouter)
 
 connectDB()
 
 if (!import.meta.env.DEV) {
+  app.use(commonRouter)
   startProdServer(app)
 } else {
   app.use(loggerMiddleware)
+  app.use(commonRouter)
 }
 
 export const server = app
