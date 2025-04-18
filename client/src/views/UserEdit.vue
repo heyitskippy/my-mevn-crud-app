@@ -53,7 +53,10 @@ const form = ref<Form>(Model.prepareForm())
 const formIsDirty = computed(() => entity.value?.checkIfDirty(form.value) ?? false)
 
 const validation = computed<Partial<Record<keyof Form, true | string>>>(() => {
-  if (!formIsDirty.value) return {}
+  const isNew = entity.value?.isNew()
+  const isDirty = entity.value?.isDirty()
+
+  if ((!formIsDirty.value && !isNew) || (!formIsDirty.value && isNew && !isDirty)) return {}
 
   return entity.value?.validate(form.value) ?? {}
 })

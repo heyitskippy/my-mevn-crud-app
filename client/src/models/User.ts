@@ -66,6 +66,10 @@ export default class User
   update(value: Partial<NullableUserEntity>, force?: boolean) {
     const entity = super.update(value, force)
 
+    if (force) {
+      this.formSnapshot = User.prepareForm(entity, undefined, true)
+    }
+
     this.fullName = entity.fullName
     this.email = entity.email
     this.role = entity.role
