@@ -6,7 +6,7 @@ import { faker } from '@faker-js/faker'
 
 export const generateUser = <T = IUser>(user?: PartialDeep<T>) => {
   return {
-    fullName: faker.person.fullName(),
+    fullName: faker.person.fullName().replace("'", ' '),
     email: faker.internet.email().toLowerCase(),
     role: Role.User,
     ...user,

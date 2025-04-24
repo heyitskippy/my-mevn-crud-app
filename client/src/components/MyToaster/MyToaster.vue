@@ -4,7 +4,7 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useUiStore } from '@/stores/ui'
 
-import { timeout } from '_/helpers'
+import { sleep } from '_/helpers'
 
 import MyToast from './MyToast.vue'
 
@@ -26,7 +26,7 @@ function showToast(index: number) {
 async function removeToast(index: number) {
   toasterQueue.value[index].visibility = false
 
-  await timeout(300)
+  await sleep(300)
 
   ui.deleteToast(index)
 }

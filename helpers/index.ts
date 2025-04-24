@@ -9,14 +9,17 @@ import { isReactive, toRaw, toValue } from 'vue'
 import Model from '@/models/Model'
 
 export function mergeDeep<T = unknown>(target: T, ...sources: unknown[]): T {
-  if (!sources.length) return target
+  if (!sources.length || !isObject(target)) return target
 
   const source = sources.shift()
 
-  if (isObject(target) && isObject(source)) {
+  if (
+    isObject(source) &&
+    (Array.isArray(target) ? Array.isArray(source) : !Array.isArray(source))
+  ) {
     for (const key in source) {
       const k = key as keyof typeof source
-      const value = source[k]
+      const value = source[k] as unknown
 
       if (!isObject(value)) Object.assign(target, { [k]: value })
       else {
@@ -83,19 +86,15 @@ export function prepareCollection<T extends NullableEntity, M extends IModel>(
   let isEmpty = targetMap.size === 0
 
   collection.forEach((entity) => {
-    let model = new Class(entity)
-    /**
-     * To keep the edited entity, but change its position according to sorting
-     */
-    if (!isEmpty) {
-      const oldModel = targetMap.get(model.id)
+    const id = entity.id
+    const hasId = id && targetMap.has(id)
 
-      if (oldModel?.isDirty() || oldModel?.isDeleted) {
-        model = oldModel
-        targetMap.delete(model.id)
+    const model = (!isEmpty && hasId && targetMap.get(id)) || new Class(entity)
 
-        if (isOnlyOne) isEmpty = true
-      }
+    if (!isEmpty && hasId) {
+      targetMap.delete(id)
+
+      if (isOnlyOne) isEmpty = true
     }
 
     targetMap.set(model.id, model)
@@ -106,18 +105,20 @@ export function prepareCollection<T extends NullableEntity, M extends IModel>(
 
 export function prepareDateTime(
   date?: unknown,
-  dateStyle: 'short' | 'full' | 'long' | 'medium' = 'short',
-  timeStyle: 'short' | 'full' | 'long' | 'medium' = 'short',
-  options?: Intl.DateTimeFormatOptions,
+  options: Intl.DateTimeFormatOptions = {},
+  locale: Intl.LocalesArgument = 'ru',
 ): Date | string {
-  if (!isMaybeDate(date)) return ''
+  if (!date || !isMaybeDate(date)) return ''
 
-  const opts = options ?? {
-    dateStyle,
-    timeStyle,
+  const opts: Intl.DateTimeFormatOptions = {
+    dateStyle: 'short',
+    timeStyle: 'short',
+    ...options,
   }
 
-  return new Date(date).toLocaleString('ru', opts)
+  const prepared = new Date(date).toLocaleString(locale, opts)
+
+  return prepared === 'Invalid Date' ? '' : prepared
 }
 
 export function fixTimezoneOffset(date: InputValue, backwards = false): Date {
@@ -172,14 +173,6 @@ export function prettifyErrors(errors: object) {
     .replaceAll('"', '')
 }
 
-export function timeout(ms: number) {
-  return new Promise((resolve) => {
-    const timeoutId = setTimeout(() => {
-      queueMicrotask(() => {
-        clearTimeout(timeoutId)
-      })
-
-      resolve(true)
-    }, ms)
-  })
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(() => resolve(true), ms))
 }

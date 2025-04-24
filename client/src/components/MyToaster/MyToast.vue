@@ -3,7 +3,7 @@ import type { ToastState } from '_/types/ui/index'
 
 import { computed, watch } from 'vue'
 
-import { timeout } from '_/helpers'
+import { sleep } from '_/helpers'
 
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/solid'
 
@@ -34,7 +34,7 @@ async function triggerToast() {
 
   emit('show-toast')
 
-  await timeout(props.state.timeout)
+  await sleep(props.state.timeout)
 
   emit('remove-toast')
 }

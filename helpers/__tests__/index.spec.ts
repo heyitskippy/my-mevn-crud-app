@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
+import type { NullableUserEntity } from '_/types/users'
 
-import User from '@/models/User'
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
+import { computed, reactive, ref, shallowReactive, shallowRef } from 'vue'
 
 import {
   cloneDeep,
@@ -9,61 +10,104 @@ import {
   isNonNullable,
   fixTimezoneOffset,
   isModelLike,
+  isNumber,
+  isObject,
+  isMaybeDate,
+  mergeDeep,
+  toOriginal,
+  prettifyErrors,
+  sleep,
+  prepareDateTime,
+  getTableItem,
+  prepareCollection,
 } from '../'
 
-describe('fixTimezoneOffset', () => {
-  const date = '2025-02-26T14:31:20.451Z'
-  const fixed = fixTimezoneOffset(date)
+import { USER_HEADERS } from '@/constants'
 
-  it('should return a Date object with the time equal to the current time plus the current timezone offset (so it should be "wrong")', () => {
-    const offset = new Date().getTimezoneOffset() * 60 * 1000
+import User from '@/models/User'
 
-    const timestamp = fixed.getTime()
-    expect(new Date(timestamp + offset).toJSON()).toBe(new Date(date).toJSON())
+describe('mergeDeep: recursively merge objects with any field type', () => {
+  it("should just return the first argument, if it's the only argument", () => {
+    const target = {
+      a: {
+        x: 0,
+        b: {
+          y: 1,
+          z: 2,
+        },
+      },
+    }
 
-    const delta = timestamp - new Date(date).getTime()
-    expect(Math.abs(delta)).toBe(Math.abs(offset))
+    expect(mergeDeep(target) == target).toBeTruthy()
   })
 
-  it('should return a "right" Date object, if it has "backwards" flag as true and a "wrong" Date as input', () => {
-    expect(fixTimezoneOffset(fixed, true).toJSON()).toBe(new Date(date).toJSON())
-  })
-})
-
-describe('cloneDeep', () => {
-  it('should simply return the value if it is primitive or undefined', () => {
-    expect(cloneDeep(3) === 3).toBeTruthy()
-    expect(cloneDeep(undefined) === undefined).toBeTruthy()
+  it("should return the first argument, if it's primitive", () => {
+    expect(mergeDeep(null, [1, 2])).toBe(null)
+    expect(mergeDeep(1, [1, 2])).toBe(1)
+    expect(mergeDeep('string', [1, 2])).toBe('string')
   })
 
-  it('should clone an empty array & an empty object', () => {
-    const arr: unknown[] = []
-    const clonedArr = cloneDeep(arr)
-    expect(clonedArr).toEqual(arr)
-    expect(clonedArr === arr).toBeFalsy()
+  it('should deep merge objects and replace fields with the same keys if: the types do not match, in the target - non-primitive, in the sources - primitive; or primitive on both sides', () => {
+    const target = {
+      a: {
+        x: 0,
+        u: {
+          b: [null, { a: 1 }],
+        },
+      },
+      j: null,
+      k: 'string',
+      b: [1, 2],
+      maybeObj: { o: 1 },
+      maybeArr: [1],
+      z: { z: 3 },
+    }
+    const object1 = {
+      a: {
+        x: 1,
+        u: {
+          y: 5,
+          k: 9,
+          b: [{ u: 3 }, { c: 2 }, null, { m: 3 }],
+        },
+      },
+      j: 1,
+      k: {
+        gf: {
+          a: [{ a: 1 }],
+        },
+      },
+      b: [4, 5],
+      maybeObj: [1],
+      maybeArr: { o: 1 },
+      z: null,
+    }
+    const object2 = {
+      a: {
+        u: {
+          b: [null, { b: { k: 100 } }],
+        },
+      },
+    }
 
-    const obj = {}
-    const clonedObj = cloneDeep(obj)
-    expect(clonedObj).toEqual(obj)
-    expect(clonedObj === obj).toBeFalsy()
-  })
+    const merged = mergeDeep(target, object1, object2)
 
-  it('should clone a matrix (nested arrays) with objects', () => {
-    const matrix = [
-      [{ id: 11 }, { id: 12 }, { id: 13 }],
-      [{ id: 21 }, { id: 22 }, { id: 23 }],
-      [{ id: 31 }, { id: 32 }, { id: 33 }],
-    ]
-
-    expect(cloneDeep(matrix).length).toEqual(matrix.length)
-    expect(cloneDeep(matrix[0]).length).toEqual(matrix[0].length)
-
-    expect(cloneDeep(matrix)).toStrictEqual(matrix)
-    expect(cloneDeep(matrix)[1][1].id).toStrictEqual(matrix[1][1].id)
-
-    expect(cloneDeep(matrix) == matrix).toBeFalsy()
-    expect(cloneDeep(matrix)[1] == matrix[1]).toBeFalsy()
-    expect(cloneDeep(matrix)[1][1] == matrix[1][1]).toBeFalsy()
+    expect(merged).toEqual({
+      a: {
+        x: 1,
+        u: {
+          y: 5,
+          k: 9,
+          b: [null, { a: 1, c: 2, b: { k: 100 } }, null, { m: 3 }],
+        },
+      },
+      j: 1,
+      k: 'string',
+      b: [4, 5],
+      maybeObj: { o: 1 },
+      maybeArr: [1],
+      z: null,
+    })
   })
 })
 
@@ -196,10 +240,271 @@ describe('deleteByModelKeys: deletes props of target whose keys are not containe
   })
 })
 
+describe('cloneDeep', () => {
+  it('should simply return the value if it is primitive or undefined', () => {
+    expect(cloneDeep(3) === 3).toBeTruthy()
+    expect(cloneDeep(undefined) === undefined).toBeTruthy()
+  })
+
+  it('should clone an empty array & an empty object', () => {
+    const arr: unknown[] = []
+    const clonedArr = cloneDeep(arr)
+    expect(clonedArr).toEqual(arr)
+    expect(clonedArr === arr).toBeFalsy()
+
+    const obj = {}
+    const clonedObj = cloneDeep(obj)
+    expect(clonedObj).toEqual(obj)
+    expect(clonedObj === obj).toBeFalsy()
+  })
+
+  it('should clone a matrix (nested arrays) with objects', () => {
+    const matrix = [
+      [{ id: 11 }, { id: 12 }, { id: 13 }],
+      [{ id: 21 }, { id: 22 }, { id: 23 }],
+      [{ id: 31 }, { id: 32 }, { id: 33 }],
+    ]
+
+    expect(cloneDeep(matrix).length).toBe(matrix.length)
+    expect(cloneDeep(matrix[0]).length).toBe(matrix[0].length)
+
+    expect(cloneDeep(matrix)).toStrictEqual(matrix)
+    expect(cloneDeep(matrix)[1][1].id).toStrictEqual(matrix[1][1].id)
+
+    expect(cloneDeep(matrix) == matrix).toBeFalsy()
+    expect(cloneDeep(matrix)[1] == matrix[1]).toBeFalsy()
+    expect(cloneDeep(matrix)[1][1] == matrix[1][1]).toBeFalsy()
+  })
+})
+
+describe('getTableItem', () => {
+  it('should return an unwrapped entity or undefined otherwise', (ctx) => {
+    const headers = USER_HEADERS
+    const key = headers[0].field
+
+    const item1 = new User(ctx.fixtures.generateUser<Partial<NullableUserEntity>>())
+    const item2 = [null, item1] as [null, User]
+
+    expect(getTableItem(item1, key) === item1).toBeTruthy()
+    expect(getTableItem(item2, key) === item1).toBeTruthy()
+
+    expect(getTableItem(item1, 'dsfsd') === undefined).toBeTruthy()
+  })
+})
+
+describe('prepareCollection', () => {
+  it('should return a collection (Map) of Users with the same fields in the snapshots as in the params', (ctx) => {
+    const users = Array.from({ length: 3 }).map((_, index) =>
+      ctx.fixtures.generateUser({ id: String(index) }),
+    )
+    const map = prepareCollection<NullableUserEntity, User>(users, new Map(), User)
+
+    expect(map.get(users[0].id)).toBeInstanceOf(User)
+
+    const values = Array.from(map.values())
+
+    expect(values.map((user) => user.getSnapshot())).toEqual(
+      users.map((user) => expect.objectContaining(user)),
+    )
+  })
+
+  it('should return the same collection with the same order as in the initial array; the passed collection had one untouched user from the initial array', (ctx) => {
+    const users = Array.from({ length: 3 }).map((_, index) =>
+      ctx.fixtures.generateUser({ id: String(index) }),
+    )
+    const secondUserId = users[1].id
+    const onlyOne = [users[1]]
+
+    const map = prepareCollection<NullableUserEntity, User>(onlyOne, new Map(), User)
+    const secondUser = map.get(secondUserId)
+
+    const theSameMap = prepareCollection<NullableUserEntity, User>(users, map, User)
+    expect(map === theSameMap).toBeTruthy()
+
+    const entries = Array.from(theSameMap)
+    const secondEntry = entries[1][1]
+
+    expect(secondUser === secondEntry).toBeTruthy()
+  })
+
+  it('should return the same collection with the same order as in the initial array; the passed collection had one EDITED user from the initial array', (ctx) => {
+    const users = Array.from({ length: 5 }).map((_, index) =>
+      ctx.fixtures.generateUser({ id: String(index) }),
+    )
+    const fourthUserId = users[3].id
+
+    const map = prepareCollection<NullableUserEntity, User>([users[1], users[3]], new Map(), User)
+    const fourthUser = map.get(fourthUserId)
+
+    if (fourthUser) fourthUser.update({ fullName: 'Drizzt Do Urden' })
+
+    prepareCollection<NullableUserEntity, User>(users, map, User)
+
+    const entries = Array.from(map)
+    const fourthEntry = entries[3][1]
+
+    expect(fourthUser === fourthEntry).toBeTruthy()
+  })
+
+  it('should return the same collection with the same order as in the initial array; the passed collection had one DELETED user from the initial array', (ctx) => {
+    const users = Array.from({ length: 5 }).map((_, index) =>
+      ctx.fixtures.generateUser({ id: String(index) }),
+    )
+    const thirdUserId = users[2].id
+
+    const map = prepareCollection<NullableUserEntity, User>([users[1], users[2]], new Map(), User)
+    const thirdUser = map.get(thirdUserId)
+
+    thirdUser?.delete()
+
+    prepareCollection<NullableUserEntity, User>(users, map, User)
+
+    const entries = Array.from(map)
+    const thirdEntry = entries[2][1]
+
+    expect(thirdUser === thirdEntry).toBeTruthy()
+  })
+
+  it('should return a collection with the same order as in the passed array; initially this collection had some edited/deleted users from this array; should keep these users untouched', (ctx) => {
+    const users = Array.from({ length: 5 }).map((_, index) =>
+      ctx.fixtures.generateUser({ id: String(index) }),
+    )
+    const secondUserId = users[1].id
+    const fourthUserId = users[3].id
+
+    const map = prepareCollection<NullableUserEntity, User>([users[1], users[3]], new Map(), User)
+    const secondUser = map.get(secondUserId)
+    const fourthUser = map.get(fourthUserId)
+
+    if (secondUser) secondUser.update({ fullName: 'Drizzt Do Urden' })
+    fourthUser?.delete()
+
+    prepareCollection<NullableUserEntity, User>(users, map, User)
+
+    const entries = Array.from(map)
+    const secondEntry = entries[1][1]
+    const fourthEntry = entries[3][1]
+
+    expect(secondEntry === secondUser).toBeTruthy()
+    expect(fourthEntry === fourthUser).toBeTruthy()
+  })
+})
+
+describe('prepareDateTime', () => {
+  it('should return a string with the local date according to the passed options and an empty string if the value is invalid', () => {
+    const dateString = '2025-02-26T17:31:20.451+03:00'
+    const date = new Date(dateString)
+
+    expect(prepareDateTime(dateString, { timeZone: '+03:00' })).toBe('26.02.2025, 17:31')
+
+    expect(prepareDateTime(date, { timeZone: '+03:00' })).toBe('26.02.2025, 17:31')
+    expect(
+      prepareDateTime(date, { timeZone: 'Europe/Moscow', dateStyle: 'full', timeStyle: 'full' }),
+    ).toBe('среда, 26 февраля 2025 г. в 17:31:20 Москва, стандартное время')
+    expect(
+      prepareDateTime(date, {
+        dateStyle: 'medium',
+        timeStyle: 'medium',
+        timeZone: '+03:00',
+      }),
+    ).toBe('26 февр. 2025 г., 17:31:20')
+
+    expect(prepareDateTime(1, { timeZone: '+03:00' })).toBe('01.01.1970, 03:00')
+    expect(prepareDateTime('1', { timeZone: '+03:00' })).toBe('01.01.2001, 00:00')
+
+    expect(prepareDateTime('2025-02-26T132')).toBe('')
+    expect(prepareDateTime('123aa')).toBe('')
+    expect(prepareDateTime('aa')).toBe('')
+    expect(prepareDateTime('')).toBe('')
+    expect(prepareDateTime(null)).toBe('')
+    expect(prepareDateTime()).toBe('')
+  })
+})
+
+describe('fixTimezoneOffset', () => {
+  const date = '2025-02-26T14:31:20.451Z'
+  const fixed = fixTimezoneOffset(date)
+
+  it('should return a Date object with the time equal to the current time plus the current timezone offset (so it should be "wrong")', () => {
+    const offset = new Date().getTimezoneOffset() * 60 * 1000
+
+    const timestamp = fixed.getTime()
+    expect(new Date(timestamp + offset).toJSON()).toBe(new Date(date).toJSON())
+
+    const delta = timestamp - new Date(date).getTime()
+    expect(Math.abs(delta)).toBe(Math.abs(offset))
+  })
+
+  it('should return a "right" Date object, if it has "backwards" flag as true and a "wrong" Date as input', () => {
+    expect(fixTimezoneOffset(fixed, true).toJSON()).toBe(new Date(date).toJSON())
+  })
+})
+
+it('isMaybeDate should return true if the value can be used as a Date constructor parameter (string/number/Date) and false otherwise', () => {
+  const value1 = Math.round(Math.random() * 10 ** 9)
+  const value2 = new Date(value1)
+  const value3 = '2'
+
+  expect(isMaybeDate(value1)).toBe(true)
+  expect(isMaybeDate(value2)).toBe(true)
+  expect(isMaybeDate(value3)).toBe(true)
+
+  expect(isMaybeDate(null)).toBe(false)
+  expect(isMaybeDate(undefined)).toBe(false)
+  expect(isMaybeDate({})).toBe(false)
+})
+
+describe('isNumber', () => {
+  const value1 = Math.random()
+  const value2 = value1 * 100
+
+  it('should return true if the value is a number and false otherwise', () => {
+    expect(isNumber(value1)).toBe(true)
+    expect(isNumber(value2)).toBe(true)
+
+    expect(isNumber(-value1)).toBe(true)
+    expect(isNumber(+0)).toBe(true)
+    expect(isNumber(-0)).toBe(true)
+
+    expect(isNumber('')).toBe(false)
+    expect(isNumber('0')).toBe(false)
+    expect(isNumber('asd')).toBe(false)
+
+    expect(isNumber(undefined)).toBe(false)
+    expect(isNumber(null)).toBe(false)
+  })
+
+  it('should return false if the value is a bigInt', () => {
+    const bigIntValue = BigInt(Math.round(value2) + 2 ** 53)
+
+    expect(isNumber(9007199254740991n)).toBe(false)
+    expect(isNumber(bigIntValue)).toBe(false)
+  })
+
+  it('should return false if the value is NaN, Infinity or -Infinity', () => {
+    expect(isNumber(NaN)).toBe(false)
+    expect(isNumber(Infinity)).toBe(false)
+    expect(isNumber(-Infinity)).toBe(false)
+  })
+})
+
 it('isEmpty should return true if the object is empty and false otherwise', () => {
   expect(isEmpty(1)).toBe(false)
   expect(isEmpty({})).toBe(true)
   expect(isEmpty({ a: 1 })).toBe(false)
+})
+
+it('isObject should return true if the value is not primitive or function and false otherwise', () => {
+  expect(isObject(1)).toBe(false)
+  expect(isObject('1')).toBe(false)
+  expect(isObject(null)).toBe(false)
+  expect(isObject(undefined)).toBe(false)
+  expect(isObject(() => 1)).toBe(false)
+
+  expect(isObject(new Map())).toBe(true)
+  expect(isObject([])).toBe(true)
+  expect(isObject({})).toBe(true)
+  expect(isObject({ a: 1 })).toBe(true)
 })
 
 it('isNonNullable should return true if the value is not null or undefined, and false otherwise', () => {
@@ -207,13 +512,98 @@ it('isNonNullable should return true if the value is not null or undefined, and 
   expect(isNonNullable(undefined)).toBe(false)
   expect(isNonNullable(0)).toBe(true)
   expect(isNonNullable('')).toBe(true)
+  expect(isNonNullable('a')).toBe(true)
 })
 
 it('isModelLike should return true if the value is an instance of the Model-like class', () => {
   expect(isModelLike(null)).toBe(false)
   expect(isModelLike(undefined)).toBe(false)
   expect(isModelLike(0)).toBe(false)
+  expect(isModelLike('a')).toBe(false)
   expect(isModelLike({})).toBe(false)
 
   expect(isModelLike(new User())).toBe(true)
+})
+
+describe('toOriginal', () => {
+  it('should return primitive or object arguments', () => {
+    expect(toOriginal(undefined)).toBe(undefined)
+    expect(toOriginal(null)).toBe(null)
+    expect(toOriginal(1)).toBe(1)
+    expect(toOriginal('a')).toBe('a')
+
+    const obj = {}
+    expect(toOriginal(obj) === obj).toBeTruthy()
+  })
+
+  it('should return the raw value instead of its ref (depth-aware) or getter', () => {
+    const ref1 = ref(1)
+
+    const obj1 = {}
+    const ref2 = ref(obj1)
+
+    const obj2 = { a: { b: {} } }
+    const ref3 = ref(obj2)
+    const getter = computed(() => obj2)
+
+    expect(toOriginal(ref1) === 1).toBeTruthy()
+    expect(toOriginal(ref2) === obj1).toBeTruthy()
+
+    expect(toOriginal(ref3) === obj2).toBeTruthy()
+    expect(toOriginal(ref3).a.b === obj2.a.b).toBeTruthy()
+
+    expect(toOriginal(getter) === obj2).toBeTruthy()
+  })
+
+  it('should return the raw value instead of its shallowRef or shallowReactive', () => {
+    const obj = { a: {} }
+    const shallowRef1 = shallowRef(obj)
+    const shallowReactive1 = shallowReactive(obj)
+
+    expect(toOriginal(shallowRef1) === obj).toBeTruthy()
+    expect(toOriginal(shallowReactive1) === obj).toBeTruthy()
+  })
+
+  it('should return the raw value instead of reactive object (depth-aware)', () => {
+    const obj = { a: { b: {} } }
+    const reactive1 = reactive(obj)
+
+    expect(toOriginal(reactive1) === obj).toBeTruthy()
+    expect(toOriginal(reactive1).a.b === obj.a.b).toBeTruthy()
+  })
+})
+
+it('prettifyErrors should return a formatted string with a list of errors', () => {
+  const errors = {
+    email: 'This email already exists!',
+    server:
+      'E11000 duplicate key error collection: my_db.users index: email_1 dup key: { email: "1111@gmail.com" }',
+  }
+
+  expect(prettifyErrors({})).toBe(' ')
+  expect(prettifyErrors(errors)).toBe(
+    ' email: This email already exists!\n server: E11000 duplicate key error collection: my_db.users index: email_1 dup key:   email: \\1111@gmail.com\\ ',
+  )
+})
+
+describe('sleep', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('should not resolve until timeout has elapsed', async () => {
+    const spy = vi.fn()
+    sleep(100).then(spy)
+
+    vi.advanceTimersByTime(20)
+    await Promise.resolve()
+    expect(spy).not.toHaveBeenCalled()
+
+    vi.advanceTimersByTime(80)
+    await Promise.resolve()
+    expect(spy).toHaveBeenCalled()
+  })
 })

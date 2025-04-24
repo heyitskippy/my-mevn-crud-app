@@ -2,7 +2,7 @@
 
 — MongoDB, Express, Vue, Node;  
 — Vite, Vitest, Cypress, TailwindCSS;  
-— Client and Server _both_ use Vite and share the same package.json, .env, etc;
+— Client and Server _both_ use Vite and share the same package.json, .env, etc;  
 — Custom responsive design.
 
 ## Project Setup
