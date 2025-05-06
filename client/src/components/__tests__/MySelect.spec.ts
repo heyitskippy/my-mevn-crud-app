@@ -22,8 +22,8 @@ describe('MySelect', () => {
     })
 
     const selected = wrapper.get('.select')
-
     const items = wrapper.get('.items')
+
     expect(items.classes('hidden')).toBeTruthy()
 
     await selected.trigger('click')
@@ -50,6 +50,11 @@ describe('MySelect', () => {
       },
     })
 
+    expect(wrapper.props('modelValue')).toBe(null)
+
+    const select = wrapper.get('select')
+    expect(select.element.value).toBe('')
+
     const selected = wrapper.get('.select')
     const items = wrapper.get('.items')
 
@@ -65,5 +70,26 @@ describe('MySelect', () => {
 
     expect(wrapper.props('modelValue')).toBe(id)
     expect(wrapper.emitted()).toHaveProperty('update:modelValue', [[id]])
+    expect(select.element.value).toBe(id)
+  })
+
+  it('should show an error message', async () => {
+    const validation = 'Error!'
+
+    const wrapper = mount(MySelect, {
+      props: {
+        modelValue: null,
+        name: TEXT1,
+        options,
+      },
+    })
+
+    expect(wrapper.find('[data-test="error"]').exists()).toBe(false)
+
+    await wrapper.setProps({ validation })
+
+    const error = wrapper.find('[data-test="error"]')
+    expect(error.exists()).toBe(true)
+    expect(error.text()).toBe(validation)
   })
 })

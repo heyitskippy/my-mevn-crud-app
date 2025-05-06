@@ -7,19 +7,19 @@ export const useRerenderHack = (isLoading: Ref<boolean>) => {
   const key = ref(0)
   const rerenderKey = refDebounced(key, 100)
 
-  const iterateKey = () => key.value++
+  const increaseKey = () => key.value++
 
   watch(
     () => isLoading.value,
     () => {
       if (isLoading.value) return
 
-      iterateKey()
+      increaseKey()
     },
   )
 
   return {
     rerenderKey,
-    iterateKey,
+    increaseKey,
   }
 }

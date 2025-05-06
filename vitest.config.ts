@@ -54,7 +54,18 @@ export default () => {
         ),
       ],
       coverage: {
-        exclude: ['client/src/router/**', 'client/src/main.ts', ...coverageConfigDefaults.exclude],
+        // see cypress e2e tests
+        exclude: [
+          'types/*',
+          'client/src/router/**',
+          'client/src/plugins/*',
+          'client/src/stores/*',
+          'client/src/tests/setup/*',
+          'client/src/views/*',
+          'client/src/main.ts',
+          'client/src/App.vue',
+          ...coverageConfigDefaults.exclude,
+        ],
       },
     },
   })

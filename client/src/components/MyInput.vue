@@ -62,6 +62,7 @@ function prepareDateValue(date: T) {
     <div
       v-if="error"
       class="absolute -bottom-4.5 w-full text-right text-xs whitespace-nowrap text-pink-600 lg:-bottom-5"
+      data-test="error"
     >
       {{ error }}
     </div>

@@ -59,3 +59,5 @@ export const DEFAULT_TOASTER_STATE: Omit<ToastState, 'key'> = {
   type: 'error',
   timeout: 3000,
 }
+
+export const TOAST_SIMULTANEOUS = 3

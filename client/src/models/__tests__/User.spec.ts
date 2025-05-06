@@ -31,6 +31,87 @@ describe('User class', () => {
     role: Role.Admin,
   } satisfies NullableUserEntity
 
+  const error = "I don't like this name!"
+
+  it('user.validate() should return true if the field is valid and a string with an error otherwise', (ctx) => {
+    const user = new User(ctx.fixtures.generateUser())
+
+    let validation = user.validate()
+
+    expect(Object.keys(validation).every((valid) => valid)).toBe(true)
+
+    user.update({ fullName: '1a a' })
+
+    validation = user.validate()
+
+    expect(typeof validation.fullName === 'string').toBeTruthy()
+    expect(validation.email).toBe(true)
+    expect(validation.role).toBe(true)
+  })
+
+  it('user.validate(form) should true if the field is valid and a string with an error otherwise', (ctx) => {
+    const mockUser = ctx.fixtures.generateUser<NullableMockUser>(darkElf)
+    const user = new User(mockUser)
+
+    let validation = user.validate()
+
+    expect(Object.keys(validation).every((valid) => valid)).toBe(true)
+
+    const form: UserForm = { ...user.toJSON(), fullName: '1a a', role: Role.User }
+    user.update(form)
+
+    validation = user.validate()
+
+    expect(typeof validation.fullName === 'string').toBeTruthy()
+    expect(validation.email).toBe(true)
+    expect(validation.role).toBe(true)
+  })
+
+  it('user.validate() should return an error prefixed with "Server" if it contains errors from user.validationErrors', (ctx) => {
+    const user = new User(ctx.fixtures.generateUser())
+
+    let validation = user.validate()
+    expect(validation.fullName).toBe(true)
+
+    user.updateValidationErrors({ fullName: error })
+
+    validation = user.validate()
+    expect(validation.fullName).toBe(`Server: ${error}`)
+  })
+
+  it('user.updateValidationErrors(undefined / {...}) should update user.validationErrors', (ctx) => {
+    const user = new User(ctx.fixtures.generateUser())
+
+    expect(user.validationErrors).toBe(null)
+
+    user.updateValidationErrors({ fullName: error })
+    expect(user.validationErrors?.fullName).toBe(error)
+
+    user.updateValidationErrors()
+    expect(user.validationErrors).toBe(null)
+  })
+
+  it('user.isValid() should return true if all fields are valid and false otherwise', (ctx) => {
+    const user = new User(ctx.fixtures.generateUser())
+
+    expect(user.isValid()).toBe(true)
+
+    user.update({ fullName: '1a a' })
+    expect(user.isValid()).toBe(false)
+
+    user.update({ fullName: '1111' })
+    expect(user.isValid()).toBe(false)
+
+    user.update({ fullName: 'Mr. Freeman' })
+    expect(user.isValid()).toBe(true)
+
+    user.updateValidationErrors({ fullName: error })
+    expect(user.isValid()).toBe(false)
+
+    user.updateValidationErrors()
+    expect(user.isValid()).toBe(true)
+  })
+
   it('user.isNew() of a new instance should return true and false otherwise', (ctx) => {
     const user = new User(ctx.fixtures.generateUser())
     expect(user).toBeInstanceOf(User)
@@ -66,9 +147,7 @@ describe('User class', () => {
   it('user.toJSON() should return an object with all current values of the User fields (the same fields as in the NullableUserEntity type)', (ctx) => {
     const user = new User(ctx.fixtures.generateUser<NullableMockUser>({ id: '🌚' }))
 
-    user.fullName = darkElf.fullName
-    user.email = darkElf.email
-    user.role = darkElf.role
+    user.update({ fullName: darkElf.fullName, email: darkElf.email, role: darkElf.role })
 
     expect(user.isDirty()).toBe(true)
     expect(user.toJSON()).toEqual(darkElf)
@@ -87,11 +166,19 @@ describe('User class', () => {
   it('user.update() should update User fields (NullableUserEntity), and snapshot with id if force: true', (ctx) => {
     const user = new User(ctx.fixtures.generateUser<NullableMockUser>({ id: '🌚' }))
 
+    const key = user.key.value
+
+    user.updateValidationErrors({ fullName: error })
+    expect(user.validationErrors).not.toBe(null)
+
     const updated = user.update(darkElf)
     expect(updated).toEqual(darkElf)
 
     expect(user.isDirty()).toBe(true)
     expect(user.toJSON()).toEqual(darkElf)
+
+    expect(user.key.value !== key).toBeTruthy()
+    expect(user.validationErrors).toBe(null)
 
     user.update({ ...darkElf, id: '🗿' }, true)
     expect(user.isDirty()).toBe(false)
@@ -103,15 +190,23 @@ describe('User class', () => {
     const user = new User(mockUser)
 
     user.update(darkElf)
-    user.delete()
 
     expect(user.toJSON()).toEqual(darkElf)
 
     user.reset()
 
     expect(user.isDirty()).toBe(false)
-    expect(user.isDeleted).toBe(false)
     expect(user.toJSON()).toMatchObject(mockUser)
+  })
+
+  it('user.delete() should set user.isDelete as false', (ctx) => {
+    const user = new User(ctx.fixtures.generateUser())
+
+    user.delete()
+    expect(user.isDeleted).toBe(true)
+
+    user.reset()
+    expect(user.isDeleted).toBe(false)
   })
 
   it('user.checkIfDirty() should return false if the param is deeply equal to the snapshot, and true otherwise', (ctx) => {

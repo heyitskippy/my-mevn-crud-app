@@ -52,7 +52,7 @@ async function handleItem(action: BtnAction, item: User | undefined) {
   if (action === 'softDelete') {
     if (item.isNew()) {
       usersStore.removeUser(item.id)
-      rerender.iterateKey()
+      rerender.increaseKey()
     } else item.delete()
   }
   if (action === 'delete') await remove(item.id)
@@ -82,7 +82,7 @@ async function save(item: User) {
 async function remove(id: Maybe<ID>) {
   if (id === null) {
     usersStore.removeUser(null)
-    rerender.iterateKey()
+    rerender.increaseKey()
   } else await usersStore.deleteUser(id)
 }
 </script>

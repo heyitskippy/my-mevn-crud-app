@@ -8,9 +8,14 @@ import routes from '@/router/routes'
 
 import TheSidebar from '../layout/TheSidebar.vue'
 
-describe('TheSidebar', async () => {
+describe('TheSidebar', () => {
+  document.body.innerHTML = `<div id="app"></div>`
+
+  const app = document.getElementById('app') ?? undefined
+
   const wrapper = mount(TheSidebar, {
     shallow: true,
+    attachTo: app,
     global: {
       stubs: { 'router-link': RouterLinkStub },
       plugins: [
@@ -23,7 +28,7 @@ describe('TheSidebar', async () => {
 
   const ui = useUiStore()
 
-  it('renders menu', async () => {
+  it('should render a menu and close when you press Escape', async () => {
     ui.showSidebar = true
     await flushPromises()
 
@@ -31,8 +36,8 @@ describe('TheSidebar', async () => {
 
     expect(wrapper.findAll('a')).toHaveLength(filteredRoutesLength)
 
-    ui.showSidebar = false
-    await flushPromises()
+    await wrapper.trigger('keyup', { key: 'Escape' })
+    expect(ui.showSidebar).toBe(false)
 
     expect(wrapper.findAll('a')).toHaveLength(0)
   })

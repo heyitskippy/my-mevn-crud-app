@@ -6,11 +6,13 @@ import type { IUser, UserEntity } from '_/types/users'
 import { describe, expect, it, vi } from 'vitest'
 import mockHttp from 'node-mocks-http'
 
+import mongoose from 'mongoose'
+
 import userService from '~/services/userService'
-import userController from '../userController'
+import userController, { handleError } from '../userController'
 
 describe('userController', () => {
-  it('getAll should return users or throw an error', async (ctx) => {
+  it('getAllUsers should return users or throw an error', async (ctx) => {
     const req = mockHttp.createRequest()
     const res = mockHttp.createResponse()
     const next = vi.fn()
@@ -32,7 +34,7 @@ describe('userController', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it('create should return user or throw an error', async (ctx) => {
+  it('createUser should return user or throw an error', async (ctx) => {
     const req = mockHttp.createRequest()
     const res = mockHttp.createResponse()
     const next = vi.fn()
@@ -54,19 +56,23 @@ describe('userController', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it('getById should return user or throw an error', async (ctx) => {
+  it('getUserById should return user or throw an error', async (ctx) => {
+    const badReq = mockHttp.createRequest<Request<{ id: ID }>>({ params: { id: '123' } })
+    const badRes = mockHttp.createResponse()
+    const next = vi.fn()
+
+    await userController.getById(badReq, badRes, next)
+    expect(badRes.statusCode).toBe(404)
+
     const id = '6802179130af1928cb41a1a2'
+    const user = ctx.fixtures.generateUser<UserEntity>({ id })
 
     const req = mockHttp.createRequest<Request<{ id: ID }>>({ params: { id } })
     const res = mockHttp.createResponse()
-    const next = vi.fn()
-
-    const user = ctx.fixtures.generateUser<UserEntity>()
 
     vi.spyOn(userService, 'fetchUserById').mockReturnValue(Promise.resolve(user))
 
     await userController.getById(req, res, next)
-
     expect(res.statusCode).toBe(200)
     expect(res._getJSONData()).toEqual({ user })
 
@@ -76,7 +82,7 @@ describe('userController', () => {
     expect(res.statusCode).toBe(404)
   })
 
-  it('update should return user or throw an error', async (ctx) => {
+  it('updateUser should return user or throw an error', async (ctx) => {
     const id = '1'
 
     const req = mockHttp.createRequest<Request<{ id: ID; user: IUser }>>({ params: { id } })
@@ -98,7 +104,7 @@ describe('userController', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it('delete should return user or throw an error', async (ctx) => {
+  it('deleteUser should return user or throw an error', async (ctx) => {
     const id = '1'
 
     const req = mockHttp.createRequest<Request<{ id: ID }>>({ params: { id } })
@@ -120,7 +126,7 @@ describe('userController', () => {
     expect(res.statusCode).toBe(500)
   })
 
-  it('createMany should return users or throw an error', async (ctx) => {
+  it('createUserList should return users or throw an error', async (ctx) => {
     const req = mockHttp.createRequest()
     const res = mockHttp.createResponse()
     const next = vi.fn()
@@ -138,11 +144,11 @@ describe('userController', () => {
       throw Error('Error!')
     })
 
-    await userController.create(req, res, next)
+    await userController.createMany(req, res, next)
     expect(res.statusCode).toBe(500)
   })
 
-  it('deleteAll should return deleteResult or throw an error', async () => {
+  it('deleteAllUsers should return deleteResult or throw an error', async () => {
     const req = mockHttp.createRequest()
     const res = mockHttp.createResponse()
     const next = vi.fn()
@@ -161,5 +167,69 @@ describe('userController', () => {
 
     await userController.deleteAll(req, res, next)
     expect(res.statusCode).toBe(500)
+  })
+})
+
+describe('handleError', () => {
+  it('should handle ValidationError (422)', () => {
+    const res = mockHttp.createResponse()
+    const errors = {
+      fieldKey: {
+        message: 'The field is invalid!',
+      } as mongoose.Error.ValidatorError,
+    }
+
+    const error = new mongoose.Error.ValidationError(new Error('Validation error!'))
+    error.errors = errors
+
+    handleError(error, res)
+
+    expect(res.statusCode).toBe(422)
+    expect(res._getJSONData()).toEqual({ errors: { fieldKey: 'The field is invalid!' } })
+  })
+
+  it('should handle duplicate key error (422)', () => {
+    const res = mockHttp.createResponse()
+    const message = 'duplicate key email: "some@email.com"'
+
+    const error = new Error(message)
+
+    handleError(error, res)
+
+    expect(res.statusCode).toBe(422)
+    expect(res._getJSONData()).toEqual({
+      errors: {
+        email: 'This email already exists!',
+        server: message,
+      },
+    })
+  })
+
+  it('should handle error 404', () => {
+    const res = mockHttp.createResponse()
+    const message = "Can't find user"
+
+    handleError(new Error(message), res, 404)
+
+    expect(res.statusCode).toBe(404)
+    expect(res._getJSONData()).toEqual({
+      errors: {
+        server: message,
+      },
+    })
+  })
+
+  it('should handle any other error (500)', () => {
+    const res = mockHttp.createResponse()
+    const message = 'Yet another error'
+
+    handleError(new Error(message), res)
+
+    expect(res.statusCode).toBe(500)
+    expect(res._getJSONData()).toEqual({
+      errors: {
+        server: message,
+      },
+    })
   })
 })

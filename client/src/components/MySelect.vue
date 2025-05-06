@@ -2,9 +2,9 @@
 import type { WritableComputedRef } from 'vue'
 
 import type { ID, Maybe } from '_/types'
-import type { RefComponent, SelectOption } from '_/types/ui'
+import type { SelectOption } from '_/types/ui'
 
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { onClickOutside, useVModel } from '@vueuse/core'
 
 import { ChevronUpDownIcon } from '@heroicons/vue/16/solid'
@@ -34,8 +34,8 @@ const modelValue: WritableComputedRef<V> = useVModel(props, 'modelValue', emit)
 
 const error = computed(() => (props.validation === true ? '' : props.validation))
 
-const selectedRef: RefComponent<typeof HTMLDivElement> = ref(null)
-const itemsRef: RefComponent<typeof HTMLDivElement> = ref(null)
+const selectedRef = useTemplateRef<HTMLDivElement>('selectedRef')
+const itemsRef = useTemplateRef<HTMLDivElement>('itemsRef')
 
 const show = ref(false)
 
@@ -61,11 +61,7 @@ function handleSelectedClick() {
 function init() {
   if (!selectedRef.value || !itemsRef.value || props.disabled) return
 
-  onClickOutside(itemsRef.value, (e) => {
-    if (e.target === selectedRef.value || e.target === selectedRef.value?.children[0]) return
-
-    show.value = false
-  })
+  onClickOutside(itemsRef, () => (show.value = false), { ignore: [selectedRef] })
 }
 
 const getKey = () => (props.optionTextKey ?? 'name') as keyof O
@@ -113,6 +109,7 @@ const getKey = () => (props.optionTextKey ?? 'name') as keyof O
     <div
       v-if="error"
       class="absolute -bottom-4.5 w-full text-right text-xs whitespace-nowrap text-pink-600 lg:-bottom-5"
+      data-test="error"
     >
       {{ error }}
     </div>

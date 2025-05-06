@@ -7,7 +7,7 @@ import routes from '@/router/routes'
 
 import TheHeader from '../layout/TheHeader.vue'
 
-describe('TheHeader', async () => {
+describe('TheHeader', () => {
   const wrapper = mount(TheHeader, {
     shallow: true,
     global: {
@@ -20,11 +20,11 @@ describe('TheHeader', async () => {
     },
   })
 
-  it('renders logo', async () => {
+  it('renders logo', () => {
     expect(wrapper.find('a').text()).toContain('MY MEVN APP')
   })
 
-  it('renders menu', async () => {
+  it('renders menu', () => {
     const filteredRoutesLength = routes.filter((route) => !route.meta.hideInMenu).length
 
     expect(wrapper.findAll('a')).toHaveLength(filteredRoutesLength + 1)

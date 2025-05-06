@@ -15,7 +15,7 @@ export interface TableHeader<T extends Partial<NullableEntity> = Partial<Nullabl
   position?: 'start' | 'center' | 'end'
 }
 
-export type TableType = IModel | NullableEntity
+export type TableType = IModel
 
 export type TableCellSlots<H extends TableHeader[]> = Record<Flatten<H>['field'], any>
 /**
@@ -38,7 +38,3 @@ export interface ToastState {
   type: 'error' | 'success'
   timeout: number
 }
-/**
- * Common
- */
-export type RefComponent<T extends abstract new (...args: any) => any> = Ref<Maybe<InstanceType<T>>>

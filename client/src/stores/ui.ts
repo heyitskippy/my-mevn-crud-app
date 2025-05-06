@@ -30,10 +30,17 @@ export const useUiStore = defineStore('ui', () => {
   const toasterQueue = ref<ToastState[]>([])
 
   function addToast(options: Partial<ToastState>) {
-    toasterQueue.value.push({ ...cloneDeep(DEFAULT_TOASTER_STATE), ...options, key: Symbol() })
+    toasterQueue.value.push({
+      key: Symbol(),
+      ...cloneDeep(DEFAULT_TOASTER_STATE),
+      ...options,
+    })
   }
 
-  function deleteToast(index: number) {
+  function deleteToast(key: symbol) {
+    const index = toasterQueue.value.findIndex((toast) => toast.key === key)
+    if (index === -1) return
+
     toasterQueue.value.splice(index, 1)
   }
 

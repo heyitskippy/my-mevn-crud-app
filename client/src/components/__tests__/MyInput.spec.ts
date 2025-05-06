@@ -1,13 +1,15 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 
+import { fixTimezoneOffset } from '_/helpers'
+
 import MyInput from '../MyInput.vue'
 
 describe('MyInput', () => {
-  it('should update "modelValue", emit the event "update:modelValue"', async () => {
-    const TEXT1 = 'test1'
-    const TEXT2 = 'test2'
+  const TEXT1 = 'test1'
+  const TEXT2 = 'test2'
 
+  it('should update "modelValue", emit the event "update:modelValue"', async () => {
     const wrapper = mount(MyInput, {
       props: {
         modelValue: TEXT1,
@@ -23,5 +25,42 @@ describe('MyInput', () => {
 
     expect(input.element.value).toBe(TEXT2)
     expect(wrapper.emitted()).toHaveProperty('update:modelValue', [[TEXT2]])
+  })
+
+  it('should show an error message', async () => {
+    const validation = 'Error!'
+
+    const wrapper = mount(MyInput, {
+      props: {
+        modelValue: null,
+        name: TEXT1,
+        label: TEXT1,
+      },
+    })
+
+    expect(wrapper.find('[data-test="error"]').exists()).toBe(false)
+
+    await wrapper.setProps({ validation })
+
+    const error = wrapper.find('[data-test="error"]')
+    expect(error.exists()).toBe(true)
+    expect(error.text()).toBe(validation)
+  })
+
+  it('should prepare date', async () => {
+    const date = '2025-02-26T14:31:20.451Z'
+    const prepared = '2025-02-26T17:31:20.451'
+
+    const wrapper = mount(MyInput, {
+      props: {
+        modelValue: date,
+        name: TEXT1,
+        label: TEXT1,
+        type: 'datetime-local',
+      },
+    })
+
+    const input = wrapper.get('input')
+    expect(input.element.value).toBe(prepared)
   })
 })

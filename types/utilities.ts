@@ -9,6 +9,14 @@ export type MakeNonNullable<T> = {
   [K in keyof T]: NonNullable<T[K]>
 }
 
+export type MakeRequired<T, K extends keyof T> = T & {
+  [SubKey in K]-?: T[SubKey]
+}
+
+export type MakePartial<T, K extends keyof T> = T & {
+  [SubKey in K]: Partial<T[SubKey]>
+}
+
 export type Flatten<T> = T extends (infer R)[] ? R : T extends Map<Maybe<ID>, infer R> ? R : T
 
 export type PartialDeep<T> = T extends object

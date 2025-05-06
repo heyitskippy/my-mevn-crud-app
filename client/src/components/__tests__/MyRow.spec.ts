@@ -15,7 +15,11 @@ describe('MyRow', () => {
 
   it('should render the item, show the row number and the actions cell', async (ctx) => {
     const index = 0
-    const item = new User(ctx.fixtures.generateUser<Partial<NullableUserEntity>>())
+    const item = new User(
+      ctx.fixtures.generateUser<Partial<NullableUserEntity>>({
+        updatedAt: new Date().toISOString(),
+      }),
+    )
 
     const wrapper = mount(MyRow<typeof item>, {
       props: {
@@ -28,6 +32,8 @@ describe('MyRow', () => {
         showActions: true,
       },
     })
+
+    expect(wrapper.classes('green')).toBeTruthy()
 
     const cells = wrapper.findAll('[data-test="cell"]')
     let amount = headers.length
@@ -72,5 +78,96 @@ describe('MyRow', () => {
 
     const numberCell = wrapper.find('.my-table-cell')
     expect(numberCell.text()).not.toBe(`${index + 1}`)
+  })
+
+  it('should emit all events except "delete"', async (ctx) => {
+    const index = 0
+    const item = new User(ctx.fixtures.generateUser<Partial<NullableUserEntity>>({ id: '🌚' }))
+
+    item.update({ email: 'forgotten-realms@email.su' })
+
+    const wrapper = mount(MyRow<typeof item>, {
+      props: {
+        index,
+        item,
+
+        headers,
+
+        showActions: true,
+      },
+    })
+
+    const actionsCell = wrapper.get('.my-table-cell:last-child')
+
+    await actionsCell.trigger('click')
+    expect(wrapper.emitted()).toHaveProperty('goTo', [[item.id]])
+
+    let btn = actionsCell.get('[name="save"]')
+    await btn.trigger('click')
+
+    btn = actionsCell.get('[name="softDelete"]')
+    await btn.trigger('click')
+
+    btn = actionsCell.get('[name="reset"]')
+    await btn.trigger('click')
+
+    expect(wrapper.emitted()).toHaveProperty('handleItem', [
+      ['save', item],
+      ['softDelete', item],
+      ['reset', item],
+    ])
+  })
+
+  it('should emit a "delete" event and not show the exclamation mark icon', async (ctx) => {
+    const index = 0
+    const item = new User(ctx.fixtures.generateUser<Partial<NullableUserEntity>>({ id: '🌚' }))
+
+    item.delete()
+
+    const wrapper = mount(MyRow<typeof item>, {
+      props: {
+        index,
+        item,
+
+        headers,
+
+        showRowNumber: true,
+        showActions: true,
+      },
+    })
+
+    const actionsCell = wrapper.get('.my-table-cell:last-child')
+
+    await actionsCell.trigger('click')
+    expect(wrapper.emitted()).toHaveProperty('goTo', [[item.id]])
+
+    const btn = actionsCell.get('[name="delete"]')
+    await btn.trigger('click')
+
+    expect(wrapper.emitted()).toHaveProperty('handleItem', [['delete', item]])
+
+    const numberCell = wrapper.get('.my-table-cell:first-child')
+    expect(numberCell.find('svg').exists()).toBe(false)
+  })
+
+  it('should show exclamation mark icon', async (ctx) => {
+    const index = 0
+    const item = new User(
+      ctx.fixtures.generateUser<Partial<NullableUserEntity>>({ id: '🌚', email: '' }),
+    )
+
+    const wrapper = mount(MyRow<typeof item>, {
+      props: {
+        index,
+        item,
+
+        headers,
+
+        showRowNumber: true,
+      },
+    })
+
+    const numberCell = wrapper.get('.my-table-cell:first-child')
+    expect(numberCell.find('svg').exists()).toBe(true)
   })
 })

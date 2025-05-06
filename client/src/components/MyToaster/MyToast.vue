@@ -1,53 +1,39 @@
 <script setup lang="ts">
-import type { ToastState } from '_/types/ui/index'
+import type { ToastState } from '_/types/ui'
 
-import { computed, watch } from 'vue'
-
-import { sleep } from '_/helpers'
+import { computed } from 'vue'
 
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/solid'
 
-const TOAST_SIMULTANEOUS = 3
-
 const props = defineProps<{
   state: ToastState
-  numberOfVisible: number
-  canShow: boolean
 }>()
 const emit = defineEmits<{
-  'show-toast': [void]
-  'remove-toast': [void]
+  'update:visibility': [value: false]
 }>()
 
 const isSuccess = computed(() => props.state.type === 'success')
 
-watch(
-  () => props.canShow,
-  async () => await triggerToast(),
-  { immediate: true },
-)
+const visibility = computed({
+  get() {
+    return props.state.visibility
+  },
+  set(value = false) {
+    if (value) return
 
-async function triggerToast() {
-  if (props.state.visibility || !props.canShow || props.numberOfVisible >= TOAST_SIMULTANEOUS) {
-    return
-  }
-
-  emit('show-toast')
-
-  await sleep(props.state.timeout)
-
-  emit('remove-toast')
-}
+    emit('update:visibility', value)
+  },
+})
 </script>
 
 <template>
   <transition name="slide-fade">
     <div
-      v-if="state.visibility"
+      v-if="visibility"
       class="toast"
       :class="state.type"
       role="alert"
-      @click="emit('remove-toast')"
+      @click="visibility = false"
     >
       <div class="icon mr-3">
         <CheckCircleIcon v-if="isSuccess" />

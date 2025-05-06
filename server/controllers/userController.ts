@@ -142,7 +142,7 @@ const deleteAllUsers = async (req: Request, res: Response, next: NextFunction) =
   }
 }
 
-const handleError = (e: any, res: Response, status = 500) => {
+export const handleError = (e: any, res: Response, status = 500) => {
   const errors: Record<string, string> = {}
 
   if (e instanceof mongoose.Error.ValidationError || /duplicate key/.test(e.message)) {

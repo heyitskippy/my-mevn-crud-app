@@ -28,10 +28,7 @@ const emit = defineEmits<{
 const getKey = (item: T | [Maybe<ID>, T]) => {
   if (Array.isArray(item)) item = item[1]
 
-  if ('key' in item) return item.key
-  else if ('id' in item) return { value: String(item.id) }
-
-  return { value: undefined }
+  return item.key
 }
 /**
  * Visibility depending on hovering ability
