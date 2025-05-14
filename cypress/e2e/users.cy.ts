@@ -50,7 +50,7 @@ describe('users', () => {
     cy.get('.my-table-row').first().contains(user.fullName)
   })
 
-  it('update user', () => {
+  it('update user (with password)', () => {
     const fullName = faker.person.fullName().replace("'", ' ')
     const password = '!1' + faker.internet.password({ length: 6 })
 
@@ -63,6 +63,27 @@ describe('users', () => {
     cy.get('input[name="fullName"]').type(fullName)
 
     cy.get('input[name="password"]').type(password)
+
+    cy.get('button[type="submit"]').click()
+
+    cy.url().should('include', '/users/list')
+
+    cy.get('.my-table-row').first().should('have.class', 'yellow')
+
+    cy.get('.my-table-row').first().find('[name="save"]').click({ force: true })
+    cy.get('.my-table-row').first().should('have.class', 'green').contains(fullName)
+  })
+
+  it('update user (without password)', () => {
+    const fullName = faker.person.fullName().replace("'", ' ')
+
+    cy.visit('/users/list')
+    cy.get('[data-test="cell"]').first().click()
+
+    cy.get('button[type="submit"]').should('be.disabled')
+
+    cy.get('input[name="fullName"]').clear()
+    cy.get('input[name="fullName"]').type(fullName)
 
     cy.get('button[type="submit"]').click()
 

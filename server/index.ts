@@ -8,7 +8,7 @@ import authRouter from './routes/auth'
 import commonRouter from './routes/common'
 import usersRouter from './routes/users'
 
-// import authMiddleware from './middlewares/authMiddleware'
+import authMiddleware from './middlewares/authMiddleware'
 import errorMiddleware from './middlewares/errorMiddleware'
 import loggerMiddleware from './middlewares/loggerMiddleware'
 
@@ -33,7 +33,7 @@ if (DEV) app.use(loggerMiddleware)
 
 app.use(`${API}/auth`, authRouter)
 
-// app.use(authMiddleware)
+app.use(authMiddleware)
 app.use(`${API}/users`, usersRouter)
 
 app.use(errorMiddleware)
