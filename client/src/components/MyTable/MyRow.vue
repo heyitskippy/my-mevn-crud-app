@@ -122,7 +122,7 @@ const getField = <F = unknown,>(key: keyof T | keyof IModel) => {
       <slot :name="header.field" :item="item">
         <span class="sm:hidden font-bold">{{ header.headerName }}: </span>
 
-        <template v-if="header.type === 'datetime'">
+        <template v-if="header.type === 'datetime-local'">
           {{ prepareDateTime(getField(header.field)) }}
         </template>
 

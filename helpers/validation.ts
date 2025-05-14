@@ -30,6 +30,17 @@ export function checkEmail(email: unknown) {
   )
 }
 
+export function checkPassword(password: unknown) {
+  let message = 'Password is required!'
+
+  if (!isNonNullable(password) || !string.isString(password)) return message
+  if (string.isEmpty(password)) return message
+
+  message = 'Password is invalid!'
+
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/.test(password) || message
+}
+
 export function checkEmptiness(value: unknown) {
   return (
     isNonNullable(value) && ((string.isString(value) && !string.isEmpty(value)) || isNumber(value))

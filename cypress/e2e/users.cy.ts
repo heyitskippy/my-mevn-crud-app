@@ -23,6 +23,7 @@ describe('users', () => {
     const user = {
       fullName: faker.person.fullName().replace("'", ' '),
       email: faker.internet.email().toLowerCase(),
+      password: '!1' + faker.internet.password({ length: 6 }),
     }
 
     cy.visit('/users/list')
@@ -32,6 +33,7 @@ describe('users', () => {
 
     cy.get('input[name="email"]').type(user.email)
     cy.get('input[name="fullName"]').type(user.fullName)
+    cy.get('input[name="password"]').type(user.password)
     cy.get('.select').click()
     cy.get('.items div').first().click()
 
@@ -50,6 +52,7 @@ describe('users', () => {
 
   it('update user', () => {
     const fullName = faker.person.fullName().replace("'", ' ')
+    const password = '!1' + faker.internet.password({ length: 6 })
 
     cy.visit('/users/list')
     cy.get('[data-test="cell"]').first().click()
@@ -58,6 +61,9 @@ describe('users', () => {
 
     cy.get('input[name="fullName"]').clear()
     cy.get('input[name="fullName"]').type(fullName)
+
+    cy.get('input[name="password"]').type(password)
+
     cy.get('button[type="submit"]').click()
 
     cy.url().should('include', '/users/list')
@@ -102,10 +108,12 @@ describe('users', () => {
     const user = {
       fullName: faker.person.fullName().replace("'", ' '),
       email: faker.internet.email().toLowerCase(),
+      password: '!1' + faker.internet.password({ length: 6 }),
     }
 
     cy.get('input[name="email"]').type(user.email)
     cy.get('input[name="fullName"]').type(user.fullName)
+    cy.get('input[name="password"]').type(user.password)
     cy.get('.select').click()
     cy.get('.items div').first().click()
 

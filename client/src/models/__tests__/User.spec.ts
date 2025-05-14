@@ -17,6 +17,8 @@ describe('User class', () => {
     email: null,
     role: null,
 
+    password: null,
+
     createdAt: null,
     updatedAt: null,
   } satisfies NullableUserEntity
@@ -29,6 +31,7 @@ describe('User class', () => {
     fullName: "Drizzt Do'Urden",
     email: 'forgotten-realms@email.su',
     role: Role.Admin,
+    password: 'Tlaz22QC',
   } satisfies NullableUserEntity
 
   const error = "I don't like this name!"
@@ -57,12 +60,18 @@ describe('User class', () => {
 
     expect(Object.keys(validation).every((valid) => valid)).toBe(true)
 
-    const form: UserForm = { ...user.toJSON(), fullName: '1a a', role: Role.User }
+    const form: UserForm = {
+      ...user.toJSON(),
+      fullName: '1a a',
+      role: Role.User,
+      password: '12345678',
+    }
     user.update(form)
 
     validation = user.validate()
 
     expect(typeof validation.fullName === 'string').toBeTruthy()
+    expect(typeof validation.password === 'string').toBeTruthy()
     expect(validation.email).toBe(true)
     expect(validation.role).toBe(true)
   })
@@ -92,7 +101,10 @@ describe('User class', () => {
   })
 
   it('user.isValid() should return true if all fields are valid and false otherwise', (ctx) => {
-    const user = new User(ctx.fixtures.generateUser())
+    const u = ctx.fixtures.generateUser()
+    const user = new User(u)
+
+    console.log('user', u)
 
     expect(user.isValid()).toBe(true)
 
@@ -147,7 +159,12 @@ describe('User class', () => {
   it('user.toJSON() should return an object with all current values of the User fields (the same fields as in the NullableUserEntity type)', (ctx) => {
     const user = new User(ctx.fixtures.generateUser<NullableMockUser>({ id: '🌚' }))
 
-    user.update({ fullName: darkElf.fullName, email: darkElf.email, role: darkElf.role })
+    user.update({
+      fullName: darkElf.fullName,
+      email: darkElf.email,
+      role: darkElf.role,
+      password: darkElf.password,
+    })
 
     expect(user.isDirty()).toBe(true)
     expect(user.toJSON()).toEqual(darkElf)
@@ -210,7 +227,7 @@ describe('User class', () => {
   })
 
   it('user.checkIfDirty() should return false if the param is deeply equal to the snapshot, and true otherwise', (ctx) => {
-    const mockUser = ctx.fixtures.generateUser(model)
+    const mockUser = ctx.fixtures.generateUser<typeof model>(model)
     const user = new User(mockUser)
 
     const form = User.prepareForm(mockUser)
@@ -230,7 +247,12 @@ describe('User class', () => {
 
     const fields = user.toJSON()
 
-    const form: UserForm = { fullName: fields.fullName, email: fields.email, role: fields.role }
+    const form: UserForm = {
+      fullName: fields.fullName,
+      email: fields.email,
+      role: fields.role,
+      password: null,
+    }
 
     expect(User.prepareForm(fields)).toEqual(form)
   })

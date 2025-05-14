@@ -5,7 +5,8 @@
     "server/tests/*",
     "server/tests/setup/*",
     "helpers/__tests__/*",
-    "env.d.ts",
+    "types/env.d.ts",
+    "types/express.d.ts",
     "vite-types.d.ts"
   ],
   "exclude": [],

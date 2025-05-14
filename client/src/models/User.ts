@@ -1,19 +1,28 @@
 import type { NullableUserEntity, UserForm } from '_/types/users'
 import type { TMap } from '_/types/utilities'
 
-import { cloneDeep, deleteByModelKeys, isEmpty, prepareCollection } from '_/helpers'
-import { checkEmail, checkFullName, checkEmptiness } from '_/helpers/validation'
+import {
+  assertAllRequired,
+  cloneDeep,
+  deleteByModelKeys,
+  isEmpty,
+  prepareCollection,
+} from '_/helpers'
+import { checkEmail, checkFullName, checkEmptiness, checkPassword } from '_/helpers/validation'
 
 import Model from './Model'
 
 export default class User
   extends Model<NullableUserEntity, UserForm>
-  implements NullableUserEntity
+  implements Omit<NullableUserEntity, 'password'>
 {
   constructor(entity: Partial<NullableUserEntity> = {}) {
     super(entity)
 
-    this.snapshot = this.prepare(entity)
+    const snap = this.prepare(entity)
+    assertAllRequired(snap)
+    this.snapshot = snap
+
     this.formSnapshot = User.prepareForm(entity, undefined, true)
 
     const snapshot = this.getSnapshot()
@@ -22,6 +31,8 @@ export default class User
     this.email = snapshot.email
     this.role = snapshot.role
 
+    this.password = snapshot.password
+
     this.createdAt = snapshot.createdAt
     this.updatedAt = snapshot.updatedAt
   }
@@ -29,6 +40,8 @@ export default class User
   fullName: NullableUserEntity['fullName']
   email: NullableUserEntity['email']
   role: NullableUserEntity['role']
+
+  protected password: NullableUserEntity['password']
 
   createdAt: NullableUserEntity['createdAt']
   updatedAt: NullableUserEntity['updatedAt']
@@ -40,17 +53,21 @@ export default class User
     email: null,
     role: null,
 
+    password: null,
+
     createdAt: null,
     updatedAt: null,
   }
-  protected snapshot
+  protected snapshot: NullableUserEntity
   protected formSnapshot
 
   validate(form: Partial<UserForm> = this.toJSON()): Record<keyof UserForm, true | string> {
+    const isNew = this.isNew()
     const valid = {
       fullName: checkFullName(form.fullName),
       email: checkEmail(form.email),
       role: checkEmptiness(form.role) || 'The role is required!',
+      password: isNew || (!isNew && form.password !== null) ? checkPassword(form.password) : true,
     }
     const errors = this.validationErrors ?? {}
 
@@ -74,6 +91,8 @@ export default class User
     this.email = entity.email
     this.role = entity.role
 
+    this.password = entity.password
+
     this.createdAt = entity.createdAt
     this.updatedAt = entity.updatedAt
 
@@ -86,6 +105,7 @@ export default class User
       fullName: null,
       email: null,
       role: null,
+      password: null,
     }),
     clone: boolean = false,
   ) {

@@ -6,6 +6,8 @@ import pluginVitest from '@vitest/eslint-plugin'
 import pluginCypress from 'eslint-plugin-cypress/flat'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
+import pluginImport from 'eslint-plugin-import'
+
 // To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
 // import { configureVueProject } from '@vue/eslint-config-typescript'
 // configureVueProject({ scriptLangs: ['ts', 'tsx'] })
@@ -37,5 +39,26 @@ export default defineConfigWithVueTs(
       '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
+
+  {
+    name: 'restrict-internal-imports',
+    plugins: {
+      import: pluginImport,
+    },
+    rules: {
+      'import/no-restricted-paths': [
+        'error',
+        {
+          zones: [
+            {
+              target: './',
+              from: './history',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   skipFormatting,
 )

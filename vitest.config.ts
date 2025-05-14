@@ -64,6 +64,7 @@ export default () => {
           'client/src/views/*',
           'client/src/main.ts',
           'client/src/App.vue',
+          'helpers/errors/*',
           ...coverageConfigDefaults.exclude,
         ],
       },

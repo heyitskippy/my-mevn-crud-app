@@ -6,7 +6,6 @@
     "helpers/*",
     "tests/*",
     "types/*",
-    "env.d.ts",
     "vite-types.d.ts"
   ],
   "exclude": ["client/src/tests/*", "client/src/**/__tests__/*", "helpers/__tests__/*"],

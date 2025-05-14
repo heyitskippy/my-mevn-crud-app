@@ -7,6 +7,9 @@ interface ImportMetaEnv {
   VITE_API: string
   VITE_CYPRESS: string
 
+  VITE_JWT_SECRET: string
+  VITE_REFRESH_SECRET: string
+
   VITE_MONGO_CONTAINER: string
   VITE_MONGO_HOST: string
   VITE_MONGO_PORT: number

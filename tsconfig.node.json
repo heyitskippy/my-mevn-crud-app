@@ -6,7 +6,9 @@
     "cypress.config.*",
     "nightwatch.conf.*",
     "playwright.config.*",
-    "eslint.config.*"
+    "eslint.config.*",
+    "types/eslint-plugin-import.d.ts",
+    "types/express.d.ts"
   ],
   "compilerOptions": {
     "noEmit": true,

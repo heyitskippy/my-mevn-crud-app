@@ -3,7 +3,7 @@ import type { NullableEntity, ID, Maybe, EntityForm } from '_/types'
 import { shallowRef } from 'vue'
 import { isEqual } from 'lodash-es'
 
-import { cloneDeep, deleteByModelKeys } from '_/helpers'
+import { assertAllRequired, cloneDeep, deleteByModelKeys } from '_/helpers'
 
 export default abstract class Model<T extends NullableEntity, F extends EntityForm> {
   constructor(entity: Partial<T>) {
@@ -68,7 +68,7 @@ export default abstract class Model<T extends NullableEntity, F extends EntityFo
     }
   }
 
-  prepare(value: Partial<T>, model = this.getModel()) {
+  prepare(value: Partial<T>, model: Partial<T> = this.getModel()) {
     const cloned = cloneDeep<Partial<T>>(value)
 
     deleteByModelKeys(cloned, model, true)
@@ -81,8 +81,10 @@ export default abstract class Model<T extends NullableEntity, F extends EntityFo
    * @param force - pass true to update the class after saving to the database
    * @returns full entity
    */
-  update(value: Partial<T>, force?: boolean) {
-    const entity = this.prepare(value, this.toJSON())
+  update(value: Partial<T>, force?: boolean): T {
+    const prepared = this.prepare(value, this.toJSON())
+    assertAllRequired(prepared)
+    const entity = prepared
 
     if (force) {
       this.id = entity.id ?? null

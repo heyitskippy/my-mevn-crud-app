@@ -1,5 +1,5 @@
-import type Model from '@/models/Model'
 import type { MakeMaybe } from './utilities'
+import type Model from '@/models/Model'
 
 export type Maybe<T> = T | null
 

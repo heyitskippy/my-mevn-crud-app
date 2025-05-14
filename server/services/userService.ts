@@ -1,6 +1,8 @@
 import type { ID, Maybe } from '_/types/index'
 import type { IUser, UserEntity } from '_/types/users'
 
+import bcrypt from 'bcrypt'
+
 import User from '~/models/User'
 
 const fetchUsers = async (): Promise<UserEntity[]> => {
@@ -11,14 +13,24 @@ const fetchUsers = async (): Promise<UserEntity[]> => {
 }
 
 const addUser = async (user: IUser): Promise<UserEntity> => {
-  const newUser = new User(user)
+  const hashedPassword = await bcrypt.hash(user.password, 10)
+
+  const newUser = new User({ ...user, password: hashedPassword })
   const saved = await newUser.save()
 
   return saved?.toJSON()
 }
 
 const addUserList = async (users: IUser[]): Promise<UserEntity[]> => {
-  const saved = await User.insertMany(users)
+  const hashed = await Promise.all(
+    users.map(async (user) => {
+      const hashedPassword = await bcrypt.hash(user.password, 10)
+
+      return { ...user, password: hashedPassword }
+    }),
+  )
+
+  const saved = await User.insertMany(hashed)
   const mapped = saved?.map((user) => user.toJSON())
 
   return mapped
@@ -49,6 +61,10 @@ const deleteAllUsers = async () => {
   return await User.deleteMany().exec()
 }
 
+const fetchUserByFields = async (user: Partial<UserEntity>) => {
+  return await User.findOne(user).exec()
+}
+
 export default {
   fetchUsers,
   addUser,
@@ -57,4 +73,6 @@ export default {
   updateUser,
   deleteUser,
   deleteAllUsers,
+
+  fetchUserByFields,
 }

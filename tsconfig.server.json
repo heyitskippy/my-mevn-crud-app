@@ -1,5 +1,5 @@
 {
-  "include": ["server/**/*", "helpers/*", "tests/*", "types/*", "env.d.ts", "vite-types.d.ts"],
+  "include": ["server/**/*", "helpers/*", "tests/*", "types/*", "vite-types.d.ts"],
   "exclude": [
     "server/tests/*",
     "server/tests/*.integration-test.ts",

@@ -2,7 +2,7 @@ import type { MaybeRefOrGetter, Reactive, ShallowReactive } from 'vue'
 
 import type { ID, IModel, Maybe, NullableEntity } from '_/types'
 import type { InputValue, TableType } from '_/types/ui'
-import type { Constructor, TMap } from '_/types/utilities'
+import type { AssertAllRequired, Constructor, TMap } from '_/types/utilities'
 
 import { isReactive, toRaw, toValue } from 'vue'
 
@@ -175,4 +175,12 @@ export function prettifyErrors(errors: object) {
 
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(() => resolve(true), ms))
+}
+
+export function assertAllRequired<T>(obj: Partial<T>): asserts obj is AssertAllRequired<T> {
+  for (const key in obj) {
+    if (obj[key as keyof T] === undefined) {
+      throw new Error(`Missing required property: "${key}"`)
+    }
+  }
 }

@@ -16,7 +16,7 @@ import User from '@/models/User'
 
 import { useError404 } from '@/composables/useError404'
 
-import { FIELD_TYPES, USER_FORM_LABELS, USER_HEADERS } from '@/constants'
+import { USER_FIELDS } from '@/constants'
 
 import { ArrowUturnLeftIcon, XCircleIcon, PencilSquareIcon } from '@heroicons/vue/16/solid'
 
@@ -46,8 +46,7 @@ const title = computed(() => {
   return entity.value.isNew() ? 'User: create' : 'User: edit'
 })
 
-const headers = USER_HEADERS
-const formLabels = USER_FORM_LABELS
+const formFields = USER_FIELDS
 
 const form = ref<Form>(Model.prepareForm())
 const formIsDirty = computed(() => entity.value?.checkIfDirty(form.value) ?? false)
@@ -121,14 +120,12 @@ function goBack() {
 }
 
 function getType(key: keyof Form) {
-  const headerType = headers.find(({ field }) => field === key)?.type ?? 'text'
-
-  return FIELD_TYPES[headerType]
+  return formFields[key]?.type ?? 'text'
 }
 
 function getReadonly(key: keyof Form) {
   const action = entity.value?.isNew() ? 'create' : 'edit'
-  const readonly = headers.find(({ field }) => field === key)?.readonly ?? {
+  const readonly = formFields[key]?.readonly ?? {
     create: false,
     edit: false,
   }
@@ -137,7 +134,7 @@ function getReadonly(key: keyof Form) {
 }
 
 function getRequired(key: keyof Form) {
-  return headers.find(({ field }) => field === key)?.required ?? false
+  return formFields[key]?.required ?? false
 }
 
 const options = shallowRef({
@@ -146,8 +143,7 @@ const options = shallowRef({
 })
 
 function getOptionsKey(key: keyof Form) {
-  return (headers.find(({ field }) => field === key)?.options ??
-    'items') as keyof typeof options.value
+  return (formFields[key]?.options ?? 'items') as keyof typeof options.value
 }
 
 onBeforeRouteLeave(() => queueMicrotask(update))
@@ -205,12 +201,12 @@ onBeforeRouteLeave(() => queueMicrotask(update))
     @submit.prevent="save"
     @keyup.enter="save"
   >
-    <template v-for="(label, key) in formLabels" :key="key">
+    <template v-for="(field, key) in formFields" :key="key">
       <MyInput
         v-if="getType(key) !== 'select'"
         v-model="form[key]"
         :name="key"
-        :label="label"
+        :label="field.label"
         :type="getType(key)"
         :disabled="getReadonly(key)"
         :required="getRequired(key)"
@@ -222,7 +218,7 @@ onBeforeRouteLeave(() => queueMicrotask(update))
         v-model="form[key]"
         :options="options[getOptionsKey(key)]"
         :name="key"
-        :label="label"
+        :label="field.label"
         :disabled="getReadonly(key)"
         :required="getRequired(key)"
         :validation="validation[key]"

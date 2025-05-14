@@ -1,12 +1,16 @@
-import type { IUser, UserEntity } from '_/types/users'
+import type { Model } from 'mongoose'
+import type { IUser, IUserMethods, UserDocument } from '_/types/users'
 import { Role } from '_/types/users'
 
-import { Model, Schema, model } from 'mongoose'
+import { Schema, model } from 'mongoose'
+import bcrypt from 'bcrypt'
 
 import { isNonNullable } from '_/helpers'
 import string from '_/helpers/string'
 
-const userSchema = new Schema<IUser>(
+type UserModelType = Model<UserDocument, object, IUserMethods>
+
+const userSchema = new Schema<IUser, UserModelType, IUserMethods>(
   {
     email: {
       type: String,
@@ -24,7 +28,7 @@ const userSchema = new Schema<IUser>(
     },
     fullName: {
       type: String,
-      minlength: [3, 'Full name must be longer than 3 characters!'],
+      minlength: [3, 'Full name must be longer than 2 characters!'],
       validate: {
         validator: function (fullName: unknown) {
           if (!isNonNullable(fullName) || !string.isString(fullName)) return true
@@ -39,17 +43,35 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: Role,
       default: Role.User,
-      required: [true, 'The role is required!'],
+    },
+    password: {
+      type: String,
+      required: [true, 'Password is required!'],
+      minlength: [8, 'Password must be longer than 7 characters!'],
+      validate: {
+        validator: function (password: unknown) {
+          if (!isNonNullable(password) || !string.isString(password)) return false
+
+          return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/.test(password)
+        },
+        message: 'Password is invalid!',
+      },
     },
   },
   {
     timestamps: true,
     id: true,
+    methods: {
+      comparePassword(plainPassword: string): Promise<boolean> {
+        return bcrypt.compare(plainPassword, this.password)
+      },
+    },
     toJSON: {
       virtuals: true,
       versionKey: false,
       transform: (_, ret) => {
         delete ret._id
+        delete ret.password
 
         return { id: ret.id, ...ret }
       },
@@ -57,4 +79,4 @@ const userSchema = new Schema<IUser>(
   },
 )
 
-export default model<IUser, Model<UserEntity>>('User', userSchema)
+export default model<IUser, UserModelType>('User', userSchema)

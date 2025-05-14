@@ -1,6 +1,4 @@
-import type { InputTypeHTMLAttribute } from 'vue'
-
-import type { FormNames, TableHeader, ToastState } from '_/types/ui'
+import type { FormFields, TableHeader, ToastState } from '_/types/ui'
 import type { NullableUserEntity, UserForm } from '_/types/users'
 
 export const TABLE_POSITIONS: Record<NonNullable<TableHeader['position']>, string> = {
@@ -9,48 +7,57 @@ export const TABLE_POSITIONS: Record<NonNullable<TableHeader['position']>, strin
   end: 'text-right',
 }
 
-export const USER_HEADERS: TableHeader<Partial<NullableUserEntity>>[] = [
+export const USER_HEADERS: TableHeader<Partial<Omit<NullableUserEntity, 'password'>>>[] = [
   {
     headerName: 'Email',
     field: 'email',
-    type: 'email',
-    readonly: { edit: true },
-    required: true,
+    type: 'text',
   },
   {
     headerName: 'Full name',
     field: 'fullName',
+    type: 'text',
   },
   {
     headerName: 'Role',
     field: 'role',
     type: 'select',
     options: 'role',
-    required: true,
   },
   {
     headerName: 'Created',
     field: 'createdAt',
-    type: 'datetime',
+    type: 'datetime-local',
   },
   {
     headerName: 'Updated',
     field: 'updatedAt',
-    type: 'datetime',
+    type: 'datetime-local',
   },
 ]
 
-export const USER_FORM_LABELS: FormNames<UserForm> = {
-  email: 'Email',
-  fullName: 'Full Name',
-  role: 'Role',
-}
-
-export const FIELD_TYPES: Record<NonNullable<TableHeader['type']>, InputTypeHTMLAttribute> = {
-  datetime: 'datetime-local',
-  text: 'text',
-  select: 'select',
-  email: 'email',
+export const USER_FIELDS: FormFields<UserForm> = {
+  email: {
+    label: 'Email',
+    type: 'email',
+    readonly: { edit: true },
+    required: true,
+  },
+  fullName: {
+    label: 'Full Name',
+    type: 'text',
+  },
+  role: {
+    label: 'Role',
+    type: 'select',
+    options: 'role',
+    required: true,
+  },
+  password: {
+    label: 'Password',
+    type: 'password',
+    required: true,
+  },
 }
 
 export const DEFAULT_TOASTER_STATE: Omit<ToastState, 'key'> = {

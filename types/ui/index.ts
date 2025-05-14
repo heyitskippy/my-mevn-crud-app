@@ -1,5 +1,5 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-import type { Ref } from 'vue'
+import type { InputTypeHTMLAttribute } from 'vue'
 import type { EntityForm, ID, IModel, Maybe, NullableEntity } from '..'
 import type { Flatten } from '../utilities'
 /**
@@ -8,9 +8,7 @@ import type { Flatten } from '../utilities'
 export interface TableHeader<T extends Partial<NullableEntity> = Partial<NullableEntity>> {
   headerName: string
   field: keyof T
-  type?: 'datetime' | 'text' | 'select' | 'email'
-  readonly?: { create?: boolean; edit?: boolean }
-  required?: boolean
+  type: 'text' | 'datetime-local' | 'select'
   options?: string
   position?: 'start' | 'center' | 'end'
 }
@@ -21,7 +19,18 @@ export type TableCellSlots<H extends TableHeader[]> = Record<Flatten<H>['field']
 /**
  * Forms / fields / buttons
  */
-export type FormNames<T extends EntityForm | object = EntityForm> = Record<keyof T, string>
+export type FormFields<T extends EntityForm = EntityForm> = Record<
+  keyof T,
+  {
+    label: string
+
+    type: InputTypeHTMLAttribute | 'select'
+    readonly?: { create?: boolean; edit?: boolean }
+    required?: boolean
+
+    options?: string
+  }
+>
 
 export type InputValue = Maybe<string | number | Date | undefined>
 

@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 import type { API } from '@/plugins/api'
 
 import type { ID, Maybe } from '_/types'
-import type { TMap } from '_/types/utilities'
+import type { MakePartial, TMap } from '_/types/utilities'
 import type { ToastState } from '_/types/ui'
 import type { NullableUserEntity } from '_/types/users'
 
@@ -71,8 +71,15 @@ export const useUsersStore = defineStore(resource, () => {
 
     singleItemIsLoading.value = true
 
+    const serialized = model.toJSON()
+    const m: MakePartial<NullableUserEntity, 'password'> = { ...model.getModel() }
+    if (serialized.password === null) delete m.password
+
     try {
-      const data = await api.post<{ [key]: ServerEntity }>(`/${resource}`, model.toJSON())
+      const data = await api.post<{ [key]: ServerEntity }>(
+        `/${resource}`,
+        model.prepare(serialized, m),
+      )
 
       id = data[key].id
 
@@ -103,8 +110,15 @@ export const useUsersStore = defineStore(resource, () => {
 
     singleItemIsLoading.value = true
 
+    const serialized = model.toJSON()
+    const m: MakePartial<NullableUserEntity, 'password'> = { ...model.getModel() }
+    if (serialized.password === null) delete m.password
+
     try {
-      const data = await api.put<{ [key]: ServerEntity }>(`/${resource}/${id}`, model.toJSON())
+      const data = await api.put<{ [key]: ServerEntity }>(
+        `/${resource}/${id}`,
+        model.prepare(serialized, m),
+      )
 
       setItem(data[key])
 
