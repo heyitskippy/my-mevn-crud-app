@@ -9,10 +9,10 @@ import * as fixtures from '_/tests/fixtures'
 declare module 'vitest' {
   export interface TestContext {
     fixtures: typeof fixtures
-    user: IUser
 
     request?: TestAgent
 
+    user?: IUser
     userEntity?: UserEntity
     accessToken?: string
     refreshToken?: string

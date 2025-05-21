@@ -1,35 +1,32 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 import { ref } from 'vue'
 
 import { useRerenderHack } from '@/composables/useRerenderHack'
-import { sleep } from '_/helpers'
 
 describe('useRerenderHack', () => {
   const timeout = 150
 
-  it(
-    'should increase rerenderKey if isLoading is false or increaseKey is called',
-    async () => {
-      const isLoading = ref(false)
+  vi.useFakeTimers()
 
-      const rerender = useRerenderHack(isLoading)
-      const { rerenderKey } = rerender
+  it('should increase rerenderKey if isLoading is false or increaseKey is called', async () => {
+    const isLoading = ref(false)
 
-      expect(rerenderKey.value).toBe(0)
+    const rerender = useRerenderHack(isLoading)
+    const { rerenderKey } = rerender
 
-      isLoading.value = true
-      await sleep(timeout)
-      expect(rerenderKey.value).toBe(0)
+    expect(rerenderKey.value).toBe(0)
 
-      isLoading.value = false
-      await sleep(timeout)
-      expect(rerenderKey.value).toBe(1)
+    isLoading.value = true
+    await vi.advanceTimersByTimeAsync(timeout)
+    expect(rerenderKey.value).toBe(0)
 
-      rerender.increaseKey()
-      await sleep(timeout)
-      expect(rerenderKey.value).toBe(2)
-    },
-    timeout * 3 + 100,
-  )
+    isLoading.value = false
+    await vi.advanceTimersByTimeAsync(timeout)
+    expect(rerenderKey.value).toBe(1)
+
+    rerender.increaseKey()
+    await vi.advanceTimersByTimeAsync(timeout)
+    expect(rerenderKey.value).toBe(2)
+  })
 })

@@ -2,11 +2,13 @@ import type { NullableUserEntity } from '_/types/users'
 import type { TableCellSlots } from '_/types/ui'
 
 import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 
 import { USER_HEADERS } from '@/constants'
 
 import User from '@/models/User'
+
+import { ExclamationCircleIcon } from '@heroicons/vue/16/solid'
 
 import MyRow from '../MyTable/MyRow.vue'
 
@@ -85,6 +87,9 @@ describe('MyRow', () => {
     const item = new User(ctx.fixtures.generateUser<Partial<NullableUserEntity>>({ id: '🌚' }))
 
     item.update({ email: 'forgotten-realms@email.su' })
+    expect(item.isDirty()).toBe(true)
+
+    await flushPromises()
 
     const wrapper = mount(MyRow<typeof item>, {
       props: {
@@ -102,13 +107,18 @@ describe('MyRow', () => {
     await actionsCell.trigger('click')
     expect(wrapper.emitted()).toHaveProperty('goTo', [[item.id]])
 
-    let btn = actionsCell.get('[name="save"]')
+    await actionsCell.trigger('mouseover')
+
+    let btn = actionsCell.find('[name="save"]')
+    expect(btn.exists()).toBe(true)
     await btn.trigger('click')
 
-    btn = actionsCell.get('[name="softDelete"]')
+    btn = actionsCell.find('[name="softDelete"]')
+    expect(btn.exists()).toBe(true)
     await btn.trigger('click')
 
-    btn = actionsCell.get('[name="reset"]')
+    btn = actionsCell.find('[name="reset"]')
+    expect(btn.exists()).toBe(true)
     await btn.trigger('click')
 
     expect(wrapper.emitted()).toHaveProperty('handleItem', [
@@ -168,6 +178,6 @@ describe('MyRow', () => {
     })
 
     const numberCell = wrapper.get('.my-table-cell:first-child')
-    expect(numberCell.find('svg').exists()).toBe(true)
+    expect(numberCell.findComponent(ExclamationCircleIcon).exists()).toBe(true)
   })
 })
