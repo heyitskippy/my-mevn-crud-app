@@ -24,9 +24,10 @@ const props = defineProps<{
       :class="[
         props.secondary ? 'secondary' : 'primary',
         {
-          icon: props.btnIcon || $slots['prepend-icon'],
+          icon: props.btnIcon || $slots['prepend-icon'] || $slots['append-icon'],
           'btn-icon': props.btnIcon,
           '!pl-3 lg:!pl-5': $slots['prepend-icon'],
+          '!pr-3 lg:!pr-5': $slots['append-icon'],
         },
       ]"
       :disabled="props.disabled"
@@ -43,6 +44,10 @@ const props = defineProps<{
       </span>
 
       <slot v-else />
+
+      <span v-if="$slots['append-icon']" class="ml-2">
+        <slot name="append-icon" />
+      </span>
     </Component>
   </div>
 </template>

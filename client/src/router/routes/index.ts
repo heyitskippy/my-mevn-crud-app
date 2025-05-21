@@ -1,4 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { Role } from '_/types/users'
+
+import { checkRights } from '@/router/auth'
 
 export default [
   {
@@ -19,7 +22,9 @@ export default [
     },
     meta: {
       title: 'Users',
+      roles: [Role.Admin, Role.User],
     },
+    beforeEnter: [checkRights],
   },
   {
     path: '/users/:id?',
@@ -31,7 +36,19 @@ export default [
     },
     meta: {
       hideInMenu: true,
+      roles: [Role.Admin],
     },
+    beforeEnter: [checkRights],
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/LoginPage.vue'),
+    meta: {
+      title: 'Login',
+      hideInMenu: true,
+    },
+    beforeEnter: [checkRights],
   },
   {
     path: '/:catchAll(.*)*',
@@ -45,5 +62,6 @@ export default [
       title: 'Error 404',
       hideInMenu: true,
     },
+    beforeEnter: [checkRights],
   },
 ] satisfies RouteRecordRaw[]

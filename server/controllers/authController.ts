@@ -23,7 +23,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       .cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: !DEV,
-        sameSite: 'none',
+        sameSite: DEV ? 'lax' : 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .json({ user, accessToken })
@@ -40,7 +40,7 @@ const refresh = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies?.refreshToken
 
   try {
-    if (!token) throw new AuthError('There is no token!', 401)
+    if (!token) throw new AuthError('There is no token!')
 
     const payload = authService.verifyRefreshToken(token)
 

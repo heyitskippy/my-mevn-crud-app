@@ -18,7 +18,7 @@ const authenticate = (req: Request, _res: Response, next: NextFunction) => {
 
     next()
   } catch (e: any) {
-    next(new AuthError(e.message ?? 'Authorization failed', 403))
+    next(new AuthError(e.message ?? 'Authorization failed'))
   }
 }
 

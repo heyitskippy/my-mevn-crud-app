@@ -91,7 +91,6 @@ export const useUsersStore = defineStore(resource, () => {
     } catch (e) {
       handleValidationError(e, getItem(null))
 
-      options.type = 'error'
       options.text = 'Something went wrong. Failed to add'
 
       console.error('[addItem]', `/${resource}/\n`, e)

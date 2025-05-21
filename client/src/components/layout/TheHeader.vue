@@ -5,14 +5,20 @@ import { computed } from 'vue'
 
 import { storeToRefs } from 'pinia'
 import { useUiStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 
 import routes from '@/router/routes'
+import { checkRole } from '@/router/auth'
 
 import MyBtn from '@/components/MyBtn.vue'
 
 import { Bars3Icon } from '@heroicons/vue/24/solid'
+import { ArrowRightEndOnRectangleIcon, UserCircleIcon } from '@heroicons/vue/16/solid'
 
 const { showSidebar } = storeToRefs(useUiStore())
+
+const authStore = useAuthStore()
+const { currentRole, currentUser } = storeToRefs(authStore)
 
 const menu = computed(() =>
   routes.map(
@@ -21,6 +27,7 @@ const menu = computed(() =>
         name: routeItem.name,
         title: routeItem.meta?.title ?? '',
         hideInMenu: routeItem.meta?.hideInMenu ?? false,
+        roles: routeItem.meta?.roles ?? [],
       }) satisfies Required<RouteMeta>,
   ),
 )
@@ -44,11 +51,28 @@ const menu = computed(() =>
 
       <nav class="hidden md:flex gap-4 text-sm lg:text-base">
         <template v-for="item in menu" :key="item.name">
-          <router-link v-if="!item.hideInMenu" :to="{ name: item.name }">
+          <router-link
+            v-if="!item.hideInMenu && checkRole(currentRole, item.roles)"
+            :to="{ name: item.name }"
+          >
             {{ item.title }}
           </router-link>
         </template>
       </nav>
+
+      <template v-if="currentUser">
+        <div class="flex items-center gap-2 ml-auto">
+          <UserCircleIcon class="hidden md:block size-3.5 lg:size-4 text-sky-400" />
+
+          <div class="hidden md:block text-sm lg:text-base">
+            {{ currentUser.email }}
+          </div>
+
+          <MyBtn title="Logout" btn-icon aria-label="Logout" @click="authStore.logout">
+            <ArrowRightEndOnRectangleIcon />
+          </MyBtn>
+        </div>
+      </template>
     </header>
   </div>
 </template>

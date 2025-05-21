@@ -104,8 +104,6 @@ describe('User class', () => {
     const u = ctx.fixtures.generateUser()
     const user = new User(u)
 
-    console.log('user', u)
-
     expect(user.isValid()).toBe(true)
 
     user.update({ fullName: '1a a' })

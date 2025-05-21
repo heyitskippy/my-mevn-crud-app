@@ -3,7 +3,7 @@ import MyHeading from '@/components/MyHeading.vue'
 </script>
 
 <template>
-  <div class="flex items-end justify-between mb-5 lg:mb-10">
+  <div class="flex items-end justify-between my-5 lg:my-10">
     <MyHeading>
       <slot name="title" />
     </MyHeading>

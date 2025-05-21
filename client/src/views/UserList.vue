@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import type { ID, Maybe } from '_/types'
 import type { BtnAction } from '_/types/ui'
+import { Role } from '_/types/users'
 import type User from '@/models/User'
 
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { checkRole } from '@/router/auth'
+
 import { storeToRefs } from 'pinia'
 import { useUiStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 import { useUsersStore } from '@/stores/users'
 
 import { useRerenderHack } from '@/composables/useRerenderHack'
@@ -16,9 +20,13 @@ import { USER_HEADERS } from '@/constants'
 
 import { CloudArrowUpIcon, PlusCircleIcon } from '@heroicons/vue/16/solid'
 
+import MyPageWrapper from '@/components/MyPageWrapper.vue'
 import MyPageTitle from '@/components/MyPageTitle.vue'
 import MyTable from '@/components/MyTable/MyTable.vue'
 import MyBtn from '@/components/MyBtn.vue'
+
+const authStore = useAuthStore()
+const { currentRole } = storeToRefs(authStore)
 
 const usersStore = useUsersStore()
 const { users, usersAreLoading, userIsDeleting, userIsLoading } = storeToRefs(usersStore)
@@ -88,43 +96,45 @@ async function remove(id: Maybe<ID>) {
 </script>
 
 <template>
-  <MyPageTitle>
-    <template #title>
-      {{ title }}
-    </template>
+  <MyPageWrapper>
+    <MyPageTitle>
+      <template #title>
+        {{ title }}
+      </template>
 
-    <template #actions>
-      <MyBtn :link="{ name: 'users-edit' }" title="Create new user" name="create">
-        <template #prepend-icon>
-          <PlusCircleIcon />
-        </template>
+      <template #actions>
+        <MyBtn :link="{ name: 'users-edit' }" title="Create new user" name="create">
+          <template #prepend-icon>
+            <PlusCircleIcon />
+          </template>
 
-        Create
-      </MyBtn>
+          Create
+        </MyBtn>
 
-      <MyBtn
-        secondary
-        class="ml-1 lg:ml-2"
-        title="Confirm changes: save to the server"
-        name="confirm"
-        @click="confirm"
-      >
-        <template #prepend-icon>
-          <CloudArrowUpIcon />
-        </template>
+        <MyBtn
+          secondary
+          class="ml-1 lg:ml-2"
+          title="Confirm changes: save to the server"
+          name="confirm"
+          @click="confirm"
+        >
+          <template #prepend-icon>
+            <CloudArrowUpIcon />
+          </template>
 
-        Confirm
-      </MyBtn>
-    </template>
-  </MyPageTitle>
+          Confirm
+        </MyBtn>
+      </template>
+    </MyPageTitle>
 
-  <MyTable
-    :key="rerenderKey"
-    :headers="headers"
-    :items="users"
-    show-actions
-    show-row-number
-    @go-to="goTo"
-    @handle-item="handleItem"
-  />
+    <MyTable
+      :key="rerenderKey"
+      :headers="headers"
+      :items="users"
+      :show-actions="checkRole(currentRole, [Role.Admin])"
+      show-row-number
+      @go-to="goTo"
+      @handle-item="handleItem"
+    />
+  </MyPageWrapper>
 </template>

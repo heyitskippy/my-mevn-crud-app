@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useUiStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 
 import MyToaster from '@/components/MyToaster/MyToaster.vue'
-/**
- * Kick-start
- */
-useUiStore()
+
+const authStore = useAuthStore()
+const { isLoading } = storeToRefs(authStore)
+
+const ui = useUiStore()
+ui.setProgress(isLoading)
 </script>
 
 <template>
@@ -15,9 +19,7 @@ useUiStore()
     <router-view name="header" />
     <router-view name="sidebar" />
 
-    <main
-      class="mx-auto my-5 lg:my-10 max-w-7xl rounded-lg border border-gray-100 bg-white p-5 lg:p-10 shadow-xl shadow-sky-50"
-    >
+    <main class="mx-auto max-w-7xl">
       <router-view />
     </main>
 

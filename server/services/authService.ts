@@ -10,8 +10,8 @@ import userService from '~/services/userService'
 const JWT_SECRET = import.meta.env.VITE_JWT_SECRET
 const REFRESH_SECRET = import.meta.env.VITE_REFRESH_SECRET
 
-const ACCESS_TOKEN_EXPIRE = '5m'
-const REFRESH_TOKEN_EXPIRE = '10m'
+const ACCESS_TOKEN_EXPIRE = '15m'
+const REFRESH_TOKEN_EXPIRE = '30d'
 
 const loginUser = async (
   maybeUser: UserEntity | { email: string; password: string },

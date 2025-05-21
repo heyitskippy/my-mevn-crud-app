@@ -1,6 +1,8 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 import type { Request, Response, NextFunction } from 'express'
 
+import jwt from 'jsonwebtoken'
+
 import mongoose from 'mongoose'
 
 const handleError = (e: any, _req: Request, res: Response, next: NextFunction) => {
@@ -25,6 +27,14 @@ const handleError = (e: any, _req: Request, res: Response, next: NextFunction) =
 
       errors['server'] = e.message
     }
+  } else if (e instanceof mongoose.Error.DocumentNotFoundError) {
+    if (status === 500) status = 404
+  } else if (e instanceof mongoose.Error.CastError) {
+    if (status === 500) status = 400
+  }
+
+  if (e instanceof jwt.TokenExpiredError || e instanceof jwt.JsonWebTokenError) {
+    if (status === 500) status = 401
   }
 
   if (e.errors) {

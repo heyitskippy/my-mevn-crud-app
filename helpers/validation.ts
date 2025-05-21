@@ -5,23 +5,23 @@ export function checkFullName(fullName: unknown) {
   if (!isNonNullable(fullName) || !string.isString(fullName)) return true
   if (string.isEmpty(fullName)) return true
 
-  let message = 'Full name must be longer than 3 characters!'
+  let message = 'Full name must be longer than 3 characters.'
 
   const trimmed = fullName.trim()
   if (trimmed.length <= 3) return message
 
-  message = 'Full name must contain at least 2 words!'
+  message = 'Full name must contain at least 2 words.'
 
   return /^[^\d\s]+(\s[^\d\s])/.test(trimmed) || message
 }
 
 export function checkEmail(email: unknown) {
-  let message = 'Email is required!'
+  let message = 'Email is required.'
 
   if (!isNonNullable(email) || !string.isString(email)) return message
   if (string.isEmpty(email)) return message
 
-  message = 'Email is invalid!'
+  message = 'Email is invalid.'
 
   return (
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -31,12 +31,12 @@ export function checkEmail(email: unknown) {
 }
 
 export function checkPassword(password: unknown) {
-  let message = 'Password is required!'
+  let message = 'Password is required.'
 
   if (!isNonNullable(password) || !string.isString(password)) return message
   if (string.isEmpty(password)) return message
 
-  message = 'Password is invalid!'
+  message = 'Password is invalid.'
 
   return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/.test(password) || message
 }

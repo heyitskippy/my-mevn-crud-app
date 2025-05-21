@@ -12,8 +12,8 @@ const fetchUsers = async (): Promise<UserEntity[]> => {
   return mapped
 }
 
-const addUser = async (user: IUser): Promise<UserEntity> => {
-  const hashedPassword = await bcrypt.hash(user.password, 10)
+const addUser = async (user: Partial<IUser>): Promise<UserEntity> => {
+  const hashedPassword = user.password ? await bcrypt.hash(user.password, 10) : ''
 
   const newUser = new User({ ...user, password: hashedPassword })
   const saved = await newUser.save()

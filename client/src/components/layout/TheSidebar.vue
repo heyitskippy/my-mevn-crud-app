@@ -5,14 +5,19 @@ import { computed, onMounted } from 'vue'
 
 import { storeToRefs } from 'pinia'
 import { useUiStore } from '@/stores/ui'
+import { useAuthStore } from '@/stores/auth'
 
 import routes from '@/router/routes'
+import { checkRole } from '@/router/auth'
 
 import MyBtn from '@/components/MyBtn.vue'
 
 import { Bars3Icon } from '@heroicons/vue/24/solid'
 
 const { showSidebar: show } = storeToRefs(useUiStore())
+
+const authStore = useAuthStore()
+const { currentRole } = storeToRefs(authStore)
 
 onMounted(() => {
   document.addEventListener('keyup', function (e) {
@@ -31,6 +36,7 @@ const menu = computed(() =>
         name: routeItem.name,
         title: routeItem.meta?.title ?? '',
         hideInMenu: routeItem.meta?.hideInMenu ?? false,
+        roles: routeItem.meta?.roles ?? [],
       }) satisfies Required<RouteMeta>,
   ),
 )
@@ -51,7 +57,7 @@ const menu = computed(() =>
       <nav class="flex flex-col gap-2 text-sm lg:text-base">
         <template v-for="item in menu" :key="item.name">
           <router-link
-            v-if="!item.hideInMenu"
+            v-if="!item.hideInMenu && checkRole(currentRole, item.roles)"
             :to="{ name: item.name }"
             class="border-b border-gray-100"
             @click="close"

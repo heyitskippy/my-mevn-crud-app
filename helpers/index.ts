@@ -1,7 +1,7 @@
 import type { MaybeRefOrGetter, Reactive, ShallowReactive } from 'vue'
 
-import type { ID, IModel, Maybe, NullableEntity } from '_/types'
-import type { InputValue, TableType } from '_/types/ui'
+import type { Form, ID, IModel, Maybe, NullableEntity } from '_/types'
+import type { FormFields, InputValue, TableType } from '_/types/ui'
 import type { AssertAllRequired, Constructor, TMap } from '_/types/utilities'
 
 import { isReactive, toRaw, toValue } from 'vue'
@@ -183,4 +183,8 @@ export function assertAllRequired<T>(obj: Partial<T>): asserts obj is AssertAllR
       throw new Error(`Missing required property: "${key}"`)
     }
   }
+}
+
+export function getType<T extends Form = Form>(key: keyof T, formFields: FormFields<T>) {
+  return formFields[key]?.type ?? 'text'
 }

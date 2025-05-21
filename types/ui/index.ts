@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 import type { InputTypeHTMLAttribute } from 'vue'
-import type { EntityForm, ID, IModel, Maybe, NullableEntity } from '..'
+import type { Form, ID, IModel, Maybe, NullableEntity } from '..'
 import type { Flatten } from '../utilities'
 /**
  * Table
@@ -19,7 +19,7 @@ export type TableCellSlots<H extends TableHeader[]> = Record<Flatten<H>['field']
 /**
  * Forms / fields / buttons
  */
-export type FormFields<T extends EntityForm = EntityForm> = Record<
+export type FormFields<T extends Form = Form> = Record<
   keyof T,
   {
     label: string
@@ -29,6 +29,10 @@ export type FormFields<T extends EntityForm = EntityForm> = Record<
     required?: boolean
 
     options?: string
+
+    defaultValue?: any
+
+    autocomplete?: string
   }
 >
 
@@ -37,6 +41,11 @@ export type InputValue = Maybe<string | number | Date | undefined>
 export type SelectOption = { id: ID; name?: string }
 
 export type BtnAction = 'reset' | 'save' | 'delete' | 'softDelete'
+
+export interface LoginForm {
+  email: Maybe<string>
+  password: Maybe<string>
+}
 /**
  * Toast
  */

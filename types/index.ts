@@ -11,6 +11,7 @@ export interface Entity extends Dates {
   id: ID
 }
 
+export type Form = object | EntityForm
 export type EntityForm = Omit<NullableEntity, 'id' | 'createdAt' | 'updatedAt'>
 export type NullableEntity = MakeMaybe<Entity>
 

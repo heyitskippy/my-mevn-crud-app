@@ -1,5 +1,3 @@
-<script lang="ts" setup></script>
-
 <template>
   <transition appear name="fade">
     <h1><slot /></h1>

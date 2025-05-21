@@ -24,7 +24,7 @@ const getAllUsers = async (_req: Request, res: Response, next: NextFunction) => 
 }
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
-  const user: IUser = req.body
+  const user: Partial<IUser> = req.body
 
   try {
     const newUser = await userService.addUser(user)

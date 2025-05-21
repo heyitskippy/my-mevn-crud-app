@@ -15,11 +15,13 @@ import { useUsersStore } from '@/stores/users'
 import User from '@/models/User'
 
 import { useError404 } from '@/composables/useError404'
+import { getType } from '_/helpers'
 
 import { USER_FIELDS } from '@/constants'
 
 import { ArrowUturnLeftIcon, XCircleIcon, PencilSquareIcon } from '@heroicons/vue/16/solid'
 
+import MyPageWrapper from '@/components/MyPageWrapper.vue'
 import MyPageTitle from '@/components/MyPageTitle.vue'
 import MyBtn from '@/components/MyBtn.vue'
 import MyInput from '@/components/MyInput.vue'
@@ -119,10 +121,6 @@ function goBack() {
   router.push(BACK_LINK)
 }
 
-function getType(key: keyof Form) {
-  return formFields[key]?.type ?? 'text'
-}
-
 function getReadonly(key: keyof Form) {
   const action = entity.value?.isNew() ? 'create' : 'edit'
   const readonly = formFields[key]?.readonly ?? {
@@ -150,79 +148,88 @@ onBeforeRouteLeave(() => queueMicrotask(update))
 </script>
 
 <template>
-  <MyPageTitle>
-    <template #title>
-      {{ title }}
-    </template>
+  <MyPageWrapper>
+    <MyPageTitle>
+      <template #title>
+        {{ title }}
+      </template>
 
-    <template #actions>
-      <MyBtn :disabled="!formIsDirty" title="Save locally" type="submit" form="user" @click="save">
-        <template #prepend-icon>
-          <PencilSquareIcon />
-        </template>
+      <template #actions>
+        <MyBtn
+          :disabled="!formIsDirty"
+          title="Save locally"
+          type="submit"
+          form="user"
+          @click="save"
+        >
+          <template #prepend-icon>
+            <PencilSquareIcon />
+          </template>
 
-        Save
-      </MyBtn>
+          Save
+        </MyBtn>
 
-      <MyBtn
-        form="user"
-        :disabled="!formIsDirty"
-        title="Reset form"
-        type="reset"
-        @click="resetForm(true)"
-      >
-        <template #prepend-icon>
-          <ArrowUturnLeftIcon />
-        </template>
+        <MyBtn
+          form="user"
+          :disabled="!formIsDirty"
+          title="Reset form"
+          type="reset"
+          @click="resetForm(true)"
+        >
+          <template #prepend-icon>
+            <ArrowUturnLeftIcon />
+          </template>
 
-        Reset
-      </MyBtn>
+          Reset
+        </MyBtn>
 
-      <MyBtn
-        secondary
-        class="ml-1 lg:ml-2"
-        title="Soft delete locally"
-        type="button"
-        @click="remove"
-      >
-        <template #prepend-icon>
-          <XCircleIcon />
-        </template>
+        <MyBtn
+          secondary
+          class="ml-1 lg:ml-2"
+          title="Soft delete locally"
+          type="button"
+          @click="remove"
+        >
+          <template #prepend-icon>
+            <XCircleIcon />
+          </template>
 
-        Delete
-      </MyBtn>
-    </template>
-  </MyPageTitle>
+          Delete
+        </MyBtn>
+      </template>
+    </MyPageTitle>
 
-  <form
-    id="user"
-    novalidate
-    class="max-w-lg mx-auto my-2 lg:my-4"
-    @submit.prevent="save"
-    @keyup.enter="save"
-  >
-    <template v-for="(field, key) in formFields" :key="key">
-      <MyInput
-        v-if="getType(key) !== 'select'"
-        v-model="form[key]"
-        :name="key"
-        :label="field.label"
-        :type="getType(key)"
-        :disabled="getReadonly(key)"
-        :required="getRequired(key)"
-        :validation="validation[key]"
-      />
+    <form
+      id="user"
+      novalidate
+      class="max-w-lg mx-auto my-2 lg:my-4"
+      @submit.prevent="save"
+      @keyup.enter="save"
+    >
+      <template v-for="(field, key) in formFields" :key="key">
+        <MyInput
+          v-if="getType(key, formFields) !== 'select'"
+          v-model="form[key]"
+          :name="key"
+          :label="field.label"
+          :type="getType(key, formFields)"
+          :disabled="getReadonly(key)"
+          :required="getRequired(key)"
+          :validation="validation[key]"
+          :autocomplete="field.autocomplete"
+        />
 
-      <MySelect
-        v-else
-        v-model="form[key]"
-        :options="options[getOptionsKey(key)]"
-        :name="key"
-        :label="field.label"
-        :disabled="getReadonly(key)"
-        :required="getRequired(key)"
-        :validation="validation[key]"
-      />
-    </template>
-  </form>
+        <MySelect
+          v-else
+          v-model="form[key]"
+          :options="options[getOptionsKey(key)]"
+          :name="key"
+          :label="field.label"
+          :disabled="getReadonly(key)"
+          :required="getRequired(key)"
+          :validation="validation[key]"
+        />
+      </template>
+    </form>
+  </MyPageWrapper>
 </template>

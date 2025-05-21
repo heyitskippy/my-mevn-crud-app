@@ -1,7 +1,11 @@
 import type { ComputedRef, Ref } from 'vue'
+import type { Maybe } from '_/types'
 import type { ToastState } from '_/types/ui'
+import type { NullableUserEntity } from '_/types/users'
 
 import { ref } from 'vue'
+
+import { useStorage } from '@vueuse/core'
 import { syncRef } from '@vueuse/shared'
 import { useNProgress } from '@vueuse/integrations/useNProgress'
 
@@ -10,6 +14,8 @@ import { defineStore } from 'pinia'
 import { cloneDeep } from '_/helpers'
 
 import { DEFAULT_TOASTER_STATE } from '@/constants'
+
+const STORE_KEY = 'my-mevn-crud-app'
 
 export const useUiStore = defineStore('ui', () => {
   /**
@@ -20,6 +26,16 @@ export const useUiStore = defineStore('ui', () => {
   function setProgress(value: Ref | ComputedRef) {
     syncRef(value, isLoading, { direction: 'ltr' })
   }
+  /**
+   * LocalStorage
+   * */
+  const storage = useStorage<{
+    currentUser: Maybe<NullableUserEntity>
+    accessToken: Maybe<string>
+  }>(STORE_KEY, {
+    currentUser: null,
+    accessToken: null,
+  })
   /**
    * Sidebar
    */
@@ -44,5 +60,25 @@ export const useUiStore = defineStore('ui', () => {
     toasterQueue.value.splice(index, 1)
   }
 
-  return { isLoading, setProgress, showSidebar, toasterQueue, addToast, deleteToast }
+  return {
+    /**
+     * Progress
+     */
+    isLoading,
+    setProgress,
+    /**
+     * LocalStorage
+     */
+    storage,
+    /**
+     * Sidebar
+     */
+    showSidebar,
+    /**
+     * Toast
+     */
+    toasterQueue,
+    addToast,
+    deleteToast,
+  }
 })

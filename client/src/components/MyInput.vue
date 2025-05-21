@@ -16,6 +16,8 @@ const props = defineProps<{
   required?: boolean
 
   validation?: string | true
+
+  autocomplete?: string
 }>()
 
 const emit = defineEmits<{
@@ -57,6 +59,7 @@ function prepareDateValue(date: T) {
       :type="props.type ?? 'text'"
       :disabled="props.disabled"
       :required="props.required"
+      :autocomplete="props.autocomplete"
     />
 
     <div
