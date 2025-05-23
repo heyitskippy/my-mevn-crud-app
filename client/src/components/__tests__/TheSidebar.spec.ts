@@ -1,6 +1,6 @@
 import { Role } from '_/types/users'
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { flushPromises, mount, RouterLinkStub } from '@vue/test-utils'
 
 import { createTestingPinia } from '@pinia/testing'
@@ -17,15 +17,25 @@ vi.mock('@/router/routes', () => ({
       path: '/',
       meta: { title: 'Home', hideInMenu: false, roles: [Role.Admin] },
     },
+    {
+      name: 'user',
+      path: '/user',
+      meta: { title: 'User', hideInMenu: false, roles: [Role.User] },
+    },
+    {
+      name: 'login',
+      path: '/login',
+      meta: { title: 'Login', hideInMenu: true },
+    },
   ],
 }))
+
 vi.mock('@/router/auth', () => ({
-  checkRole: () => true,
+  checkRole: (role: Role, roles: Role[]) => roles.includes(role),
 }))
 
 describe('TheSidebar', () => {
   const currentUser = { email: 'test@test.test', role: Role.Admin }
-  const accessToken = 'test-token'
   const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -39,12 +49,11 @@ describe('TheSidebar', () => {
   let ui: ReturnType<typeof useUiStore>
   let wrapper: ReturnType<typeof mount>
 
-  beforeEach(async () => {
+  const mountSidebar = (showSidebar = true) => {
     document.body.innerHTML = `<div id="app"></div>`
     const app = document.getElementById('app') ?? undefined
 
-    wrapper = mount(TheSidebar, {
-      shallow: true,
+    return mount(TheSidebar, {
       attachTo: app,
       global: {
         stubs: { 'router-link': RouterLinkStub },
@@ -52,16 +61,10 @@ describe('TheSidebar', () => {
           router,
           createTestingPinia({
             initialState: {
-              auth: {
-                currentUser,
-                currentRole: Role.Admin,
-              },
+              auth: { currentUser },
               ui: {
-                showSidebar: true,
-                storage: {
-                  currentUser,
-                  accessToken,
-                },
+                showSidebar,
+                storage: { currentUser },
               },
             },
             createSpy: vi.fn,
@@ -72,20 +75,27 @@ describe('TheSidebar', () => {
           api: {
             setRefresh: vi.fn(),
             setAccessToken: vi.fn(),
-            get: vi.fn().mockResolvedValue({ user: currentUser, accessToken }),
+            get: vi.fn().mockResolvedValue({ user: currentUser }),
           },
         },
       },
     })
+  }
 
+  beforeEach(async () => {
+    wrapper = mountSidebar()
     ui = useUiStore()
-
+    await flushPromises()
     await router.isReady()
+  })
+  afterEach(() => {
+    vi.clearAllMocks()
+    vi.resetModules()
   })
 
   it('should render the menu when showSidebar is true', async () => {
-    await flushPromises()
     expect(wrapper.findAll('a')).toHaveLength(1)
+    expect(wrapper.find('.backdrop-blur-sm').exists()).toBe(true)
   })
 
   it('should close sidebar on Escape key press', async () => {
@@ -99,5 +109,23 @@ describe('TheSidebar', () => {
 
     await overlay.trigger('click.self')
     expect(ui.showSidebar).toBe(false)
+  })
+
+  it('renders the menu with only visible and allowed routes', () => {
+    const links = wrapper.findAllComponents(RouterLinkStub)
+    const linkTexts = links.map((link) => link.text())
+
+    expect(linkTexts).toContain('Home')
+    expect(linkTexts).not.toContain('Login')
+    expect(linkTexts).not.toContain('User')
+  })
+
+  it('does not render the sidebar or overlay when showSidebar is false', async () => {
+    wrapper.unmount()
+    wrapper = mountSidebar(false)
+
+    await flushPromises()
+    expect(wrapper.find('aside').exists()).toBe(false)
+    expect(wrapper.find('.backdrop-blur-sm').exists()).toBe(false)
   })
 })

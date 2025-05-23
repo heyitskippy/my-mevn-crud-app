@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest'
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-import { fixTimezoneOffset } from '_/helpers'
+import * as helpers from '_/helpers'
 
 import MyInput from '../MyInput.vue'
 
@@ -62,5 +63,21 @@ describe('MyInput', () => {
 
     const input = wrapper.get('input')
     expect(input.element.value).toBe(prepared)
+  })
+
+  it('should return empty string if prepareDateValue gets invalid date', async () => {
+    const wrapper = mount(MyInput, {
+      props: {
+        modelValue: 'invalid-date',
+        name: 'date',
+        label: 'Date',
+        type: 'datetime-local',
+      },
+    })
+
+    vi.spyOn(helpers, 'fixTimezoneOffset').mockReturnValueOnce({ toJSON: () => undefined } as any)
+
+    const input = wrapper.get('input')
+    expect(input.element.value).toBe('')
   })
 })

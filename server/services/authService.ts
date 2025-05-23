@@ -17,15 +17,18 @@ const loginUser = async (
   maybeUser: UserEntity | { email: string; password: string },
   isRegister: boolean,
 ): Promise<{ user: UserEntity; accessToken: string; refreshToken: string }> => {
+  const message = 'Invalid credentials!'
   let user: Maybe<UserEntity> = null
 
   if (!isRegister) {
     const { email, password } = maybeUser as { email: string; password: string }
 
+    if (!password) throw new AuthError(message)
+
     const userDocument = await userService.fetchUserByFields({ email })
 
-    if (!userDocument || !password || !(await userDocument?.comparePassword(password))) {
-      throw new AuthError('Invalid credentials!')
+    if (!userDocument || !(await userDocument.comparePassword(password))) {
+      throw new AuthError(message)
     }
 
     user = userDocument?.toJSON()

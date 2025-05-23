@@ -101,8 +101,14 @@ describe('User class', () => {
   })
 
   it('user.isValid() should return true if all fields are valid and false otherwise', (ctx) => {
-    const u = ctx.fixtures.generateUser()
-    const user = new User(u)
+    const user = new User(
+      ctx.fixtures.generateUser({
+        fullName: 'Valid Name',
+        email: 'valid@email.com',
+        password: 'Valid123!',
+        role: Role.User,
+      }),
+    )
 
     expect(user.isValid()).toBe(true)
 

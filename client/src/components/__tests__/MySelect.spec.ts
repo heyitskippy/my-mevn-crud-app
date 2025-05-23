@@ -92,4 +92,24 @@ describe('MySelect', () => {
     expect(error.exists()).toBe(true)
     expect(error.text()).toBe(validation)
   })
+
+  it('should not open dropdown when disabled', async () => {
+    const wrapper = mount(MySelect, {
+      props: {
+        modelValue: null,
+        name: 'disabled',
+        label: 'Disabled',
+        options: [{ id: '1', name: 'One' }],
+        disabled: true,
+      },
+    })
+
+    const selected = wrapper.get('.select')
+    const items = wrapper.get('.items')
+
+    expect(items.classes('hidden')).toBeTruthy()
+
+    await selected.trigger('click')
+    expect(items.classes('hidden')).toBeTruthy()
+  })
 })

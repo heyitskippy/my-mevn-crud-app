@@ -5,8 +5,7 @@ import type { NullableUserEntity } from '_/types/users'
 
 import { ref } from 'vue'
 
-import { useStorage } from '@vueuse/core'
-import { syncRef } from '@vueuse/shared'
+import { useStorage, syncRef } from '@vueuse/core'
 import { useNProgress } from '@vueuse/integrations/useNProgress'
 
 import { defineStore } from 'pinia'

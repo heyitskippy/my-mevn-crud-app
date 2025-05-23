@@ -54,4 +54,40 @@ describe('MyBtn', () => {
     await btn.trigger('click')
     expect(wrapper.emitted()).not.toHaveProperty('click')
   })
+
+  it('renders prepend-icon slot', () => {
+    const wrapper = mount(MyBtn, {
+      slots: {
+        'prepend-icon': '<svg class="test-prepend" />',
+        default: 'With Icon',
+      },
+      shallow: true,
+    })
+    expect(wrapper.find('.mr-2 .test-prepend').exists()).toBe(true)
+  })
+
+  it('renders append-icon slot', () => {
+    const wrapper = mount(MyBtn, {
+      slots: {
+        'append-icon': '<svg class="test-append" />',
+        default: 'With Icon',
+      },
+      shallow: true,
+    })
+
+    expect(wrapper.find('.ml-2 .test-append').exists()).toBe(true)
+  })
+
+  it('renders as icon button when btnIcon is true', () => {
+    const wrapper = mount(MyBtn, {
+      props: { btnIcon: true },
+      slots: {
+        default: '<svg class="icon-content" />',
+      },
+      shallow: true,
+    })
+
+    expect(wrapper.find('.my-btn').classes()).toContain('btn-icon')
+    expect(wrapper.find('.icon-content').exists()).toBe(true)
+  })
 })

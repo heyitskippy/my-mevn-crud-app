@@ -3,8 +3,7 @@ import type { ID, Maybe } from '_/types'
 import type { BtnAction, TableHeader, TableType } from '_/types/ui'
 import type { TMap } from '_/types/utilities'
 
-import { onMounted, ref } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import { getTableItem } from '_/helpers'
 
@@ -37,7 +36,7 @@ const actionsVisibility = ref(true)
 const mql = ref<Maybe<{ removeListener: () => void }>>(null)
 
 onMounted(() => (mql.value = handleHovering()))
-onBeforeRouteLeave(() => mql.value?.removeListener())
+onUnmounted(() => mql.value?.removeListener())
 
 function handleHovering() {
   const mediaQueryList = window.matchMedia(

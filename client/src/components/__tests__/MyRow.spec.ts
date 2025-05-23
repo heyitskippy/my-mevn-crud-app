@@ -1,8 +1,8 @@
 import type { NullableUserEntity } from '_/types/users'
 import type { TableCellSlots } from '_/types/ui'
 
-import { describe, it, expect } from 'vitest'
-import { flushPromises, mount } from '@vue/test-utils'
+import { describe, it, expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
 
 import { USER_HEADERS } from '@/constants'
 
@@ -87,9 +87,13 @@ describe('MyRow', () => {
     const item = new User(ctx.fixtures.generateUser<Partial<NullableUserEntity>>({ id: '🌚' }))
 
     item.update({ email: 'forgotten-realms@email.su' })
+    vi.spyOn(item, 'validate').mockReturnValue({
+      email: true,
+      fullName: true,
+      password: true,
+      role: true,
+    })
     expect(item.isDirty()).toBe(true)
-
-    await flushPromises()
 
     const wrapper = mount(MyRow<typeof item>, {
       props: {
@@ -106,8 +110,6 @@ describe('MyRow', () => {
 
     await actionsCell.trigger('click')
     expect(wrapper.emitted()).toHaveProperty('goTo', [[item.id]])
-
-    await actionsCell.trigger('mouseover')
 
     let btn = actionsCell.find('[name="save"]')
     expect(btn.exists()).toBe(true)

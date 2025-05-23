@@ -2,11 +2,12 @@ import { describe, expect, it, vi } from 'vitest'
 import mockHttp from 'node-mocks-http'
 
 import mongoose from 'mongoose'
+import jwt from 'jsonwebtoken'
 
 import HttpError from '_/helpers/errors/HttpError'
 
 import handleError from '../errorMiddleware'
-// TODO: complete tests
+
 describe('handleError', () => {
   it('should handle ValidationError (422)', () => {
     const req = mockHttp.createRequest()
@@ -76,5 +77,53 @@ describe('handleError', () => {
         server: message,
       },
     })
+  })
+
+  it('should handle DocumentNotFoundError (404)', () => {
+    const req = mockHttp.createRequest()
+    const res = mockHttp.createResponse()
+    const next = vi.fn()
+
+    const error = new mongoose.Error.DocumentNotFoundError('Not found!')
+    handleError(error, req, res, next)
+
+    expect(res.statusCode).toBe(404)
+    expect(res._getJSONData()).toEqual({ errors: { server: error.message } })
+  })
+
+  it('should handle CastError (400)', () => {
+    const req = mockHttp.createRequest()
+    const res = mockHttp.createResponse()
+    const next = vi.fn()
+
+    const error = new mongoose.Error.CastError('ObjectId', 'badid', 'id')
+    handleError(error, req, res, next)
+
+    expect(res.statusCode).toBe(400)
+    expect(res._getJSONData()).toEqual({ errors: { server: error.message } })
+  })
+
+  it('should handle TokenExpiredError (401)', () => {
+    const req = mockHttp.createRequest()
+    const res = mockHttp.createResponse()
+    const next = vi.fn()
+
+    const error = new jwt.TokenExpiredError('jwt expired', new Date())
+    handleError(error, req, res, next)
+
+    expect(res.statusCode).toBe(401)
+    expect(res._getJSONData()).toEqual({ errors: { server: error.message } })
+  })
+
+  it('should handle JsonWebTokenError (401)', () => {
+    const req = mockHttp.createRequest()
+    const res = mockHttp.createResponse()
+    const next = vi.fn()
+
+    const error = new jwt.JsonWebTokenError('jwt malformed')
+    handleError(error, req, res, next)
+
+    expect(res.statusCode).toBe(401)
+    expect(res._getJSONData()).toEqual({ errors: { server: error.message } })
   })
 })

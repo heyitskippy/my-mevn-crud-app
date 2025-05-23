@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import type { NullableUserEntity } from '_/types/users'
 
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
@@ -20,6 +21,8 @@ import {
   prepareDateTime,
   getTableItem,
   prepareCollection,
+  assertAllRequired,
+  getType,
 } from '../'
 
 import { USER_HEADERS } from '@/constants'
@@ -438,6 +441,11 @@ describe('fixTimezoneOffset', () => {
   it('should return a "right" Date object, if it has "backwards" flag as true and a "wrong" Date as input', () => {
     expect(fixTimezoneOffset(fixed, true).toJSON()).toBe(new Date(date).toJSON())
   })
+
+  it('should return new Date for invalid input', () => {
+    const result = fixTimezoneOffset(undefined as any)
+    expect(result).toBeInstanceOf(Date)
+  })
 })
 
 it('isMaybeDate should return true if the value can be used as a Date constructor parameter (string/number/Date) and false otherwise', () => {
@@ -488,10 +496,15 @@ describe('isNumber', () => {
   })
 })
 
-it('isEmpty should return true if the object is empty and false otherwise', () => {
-  expect(isEmpty(1)).toBe(false)
-  expect(isEmpty({})).toBe(true)
-  expect(isEmpty({ a: 1 })).toBe(false)
+describe('isEmpty', () => {
+  it('should return true if the object is empty and false otherwise', () => {
+    expect(isEmpty([])).toBe(true)
+    expect(isEmpty({})).toBe(true)
+
+    expect(isEmpty(1)).toBe(false)
+    expect(isEmpty({ a: 1 })).toBe(false)
+    expect(isEmpty([1, 2])).toBe(false)
+  })
 })
 
 it('isObject should return true if the value is not primitive or function and false otherwise', () => {
@@ -499,7 +512,7 @@ it('isObject should return true if the value is not primitive or function and fa
   expect(isObject('1')).toBe(false)
   expect(isObject(null)).toBe(false)
   expect(isObject(undefined)).toBe(false)
-  expect(isObject(() => 1)).toBe(false)
+  expect(isObject(() => {})).toBe(false)
 
   expect(isObject(new Map())).toBe(true)
   expect(isObject([])).toBe(true)
@@ -571,19 +584,34 @@ describe('toOriginal', () => {
     expect(toOriginal(reactive1) === obj).toBeTruthy()
     expect(toOriginal(reactive1).a.b === obj.a.b).toBeTruthy()
   })
+
+  it('toOriginal should handle circular references gracefully', () => {
+    const obj: any = {}
+
+    obj.self = obj
+
+    expect(toOriginal(obj)).toBe(obj)
+  })
 })
 
-it('prettifyErrors should return a formatted string with a list of errors', () => {
-  const errors = {
-    email: 'This email already exists!',
-    server:
-      'E11000 duplicate key error collection: my_db.users index: email_1 dup key: { email: "1111@gmail.com" }',
-  }
+describe('prettifyErrors', () => {
+  it('should return a formatted string with a list of errors', () => {
+    const errors = {
+      email: 'This email already exists!',
+      server:
+        'E11000 duplicate key error collection: my_db.users index: email_1 dup key: { email: "1111@gmail.com" }',
+    }
 
-  expect(prettifyErrors({})).toBe(' ')
-  expect(prettifyErrors(errors)).toBe(
-    ' email: This email already exists!\n server: E11000 duplicate key error collection: my_db.users index: email_1 dup key:   email: \\1111@gmail.com\\ ',
-  )
+    expect(prettifyErrors({})).toBe(' ')
+    expect(prettifyErrors(errors)).toBe(
+      ' email: This email already exists!\n server: E11000 duplicate key error collection: my_db.users index: email_1 dup key:   email: \\1111@gmail.com\\ ',
+    )
+  })
+
+  it('should handle empty input gracefully', () => {
+    expect(prettifyErrors(undefined as any)).toBe('')
+    expect(prettifyErrors(null as any)).toBe('')
+  })
 })
 
 describe('sleep', () => {
@@ -605,5 +633,41 @@ describe('sleep', () => {
     vi.advanceTimersByTime(80)
     await Promise.resolve()
     expect(spy).toHaveBeenCalled()
+  })
+
+  it('sleep resolves immediately for 0 ms', async () => {
+    const promise = sleep(0)
+    vi.advanceTimersByTime(0)
+
+    const result = await promise
+    expect(result).toBe(true)
+  })
+})
+
+describe('assertAllRequired', () => {
+  it('should not throw if all properties are present', () => {
+    expect(() => assertAllRequired({ a: 1, b: 2 })).not.toThrow()
+  })
+
+  it('should throw if a property is missing', () => {
+    expect(() => assertAllRequired({ a: 1, b: undefined })).toThrow(
+      /Missing required property: "b"/,
+    )
+  })
+})
+
+describe('getType', () => {
+  it('should return the correct type from formFields', () => {
+    const fields = { foo: { type: 'number' }, bar: { type: 'email' } }
+
+    expect(getType('foo', fields as any)).toBe('number')
+    expect(getType('bar', fields as any)).toBe('email')
+  })
+
+  it('should return "text" if type is not defined', () => {
+    const fields = { foo: {} }
+
+    expect(getType('foo', fields as any)).toBe('text')
+    expect(getType('baz', fields as any)).toBe('text')
   })
 })

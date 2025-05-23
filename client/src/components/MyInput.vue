@@ -42,7 +42,7 @@ const value = computed({
 const error = computed(() => (props.validation === true ? '' : props.validation))
 
 function prepareDateValue(date: T) {
-  return fixTimezoneOffset(date).toJSON().split('Z')[0] ?? ''
+  return fixTimezoneOffset(date).toJSON()?.split('Z')[0] ?? ''
 }
 </script>
 

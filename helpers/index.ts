@@ -165,6 +165,8 @@ export function toOriginal<T = unknown>(
 }
 
 export function prettifyErrors(errors: object) {
+  if (!errors) return ''
+
   return JSON.stringify(errors)
     .replaceAll(',', '\n ')
     .replaceAll('{', ' ')

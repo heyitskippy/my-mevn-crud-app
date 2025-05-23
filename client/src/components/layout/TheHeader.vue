@@ -62,7 +62,10 @@ const menu = computed(() =>
 
       <template v-if="currentUser">
         <div class="flex items-center gap-2 ml-auto">
-          <UserCircleIcon class="hidden md:block size-3.5 lg:size-4 text-sky-400" />
+          <UserCircleIcon
+            class="hidden md:block size-3.5 lg:size-4 text-sky-400"
+            data-test="user"
+          />
 
           <div class="hidden md:block text-sm lg:text-base">
             {{ currentUser.email }}

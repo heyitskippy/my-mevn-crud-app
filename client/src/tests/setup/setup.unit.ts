@@ -2,7 +2,7 @@ import { beforeEach, afterEach, vi } from 'vitest'
 
 import * as fixtures from '_/tests/fixtures'
 
-beforeEach(async (ctx) => {
+beforeEach((ctx) => {
   ctx.fixtures = fixtures
 
   Object.defineProperty(window, 'matchMedia', {

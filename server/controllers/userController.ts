@@ -46,7 +46,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 const getUserById = async (req: Request<{ id?: ID }>, res: Response, next: NextFunction) => {
-  const id: ID | undefined = req.path === '/me' ? req.user?.id : req.params.id
+  const id = req.params.id
 
   try {
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
