@@ -8,6 +8,7 @@ import authService from '~/services/authService'
 import userService from '~/services/userService'
 
 const DEV = import.meta.env.DEV
+const isCypressTest = !!import.meta.env.CYPRESS || !!process.env.CYPRESS
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   const maybeUser: UserEntity | { email: string; password: string } = req.body
@@ -22,8 +23,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       .status(200)
       .cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: !DEV,
-        sameSite: DEV ? 'lax' : 'none',
+        secure: !DEV && !isCypressTest,
+        sameSite: DEV || isCypressTest ? 'lax' : 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .json({ user, accessToken })

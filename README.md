@@ -50,10 +50,24 @@ yarn build
 yarn test:e2e
 ```
 
-### Prepare MongoDB with Docker for Development
+### Prepare MongoDB with Docker
+
+Development:
 
 ```sh
 yarn prepare:mongo:dev
+```
+
+Production:
+
+```sh
+yarn prepare:mongo:prod
+```
+
+### Prepare Admin User for Development
+
+```sh
+yarn prepare:seed:admin
 ```
 
 Check package.json scripts for more.

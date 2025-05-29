@@ -20,11 +20,16 @@ const DEV = import.meta.env.DEV
 const BASE = import.meta.env.VITE_BASE
 const PORT = import.meta.env.VITE_CLIENT_PORT
 
-const API = import.meta.env.VITE_API
+const API = import.meta.env.VITE_ROUTES_API
 
 const app = express()
 
-app.use(cors({ origin: `${BASE}:${PORT}`, credentials: true }))
+app.use(
+  cors({
+    origin: `${BASE}:${PORT}`,
+    credentials: true,
+  }),
+)
 app.use(cookieParser())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))

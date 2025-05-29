@@ -85,3 +85,5 @@ export const DEFAULT_TOASTER_STATE: Omit<ToastState, 'key'> = {
 }
 
 export const TOAST_SIMULTANEOUS = 3
+
+export const STORE_KEY = import.meta.env.VITE_STORE_KEY

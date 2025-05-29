@@ -1,7 +1,7 @@
 {
   "name": "my-mevn-crud-app",
   "author": "heyitskippy",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -23,7 +23,8 @@
     "lint": "eslint ./client/src/ --fix",
     "format": "prettier --write client/src/",
     "prepare:mongo:dev": "dotenv -e .env.development -- docker compose -f server/docker-compose.yml up -d",
-    "prepare:mongo:prod": "dotenv -e .env.production -- docker compose -f server/docker-compose.yml up -d"
+    "prepare:mongo:prod": "dotenv -e .env.production -- docker compose -f server/docker-compose.yml up -d",
+    "prepare:seed:admin": "vite-node --config vite.config.server.ts server/config/seedAdminRunner.ts"
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
@@ -87,6 +88,7 @@
     "supertest": "^7.0.0",
     "typescript": "~5.7.3",
     "vite": "^6.0.11",
+    "vite-node": "^3.1.4",
     "vite-plugin-node": "^4.0.0",
     "vite-plugin-vue-devtools": "^7.7.1",
     "vite-tsconfig-paths": "^5.1.4",

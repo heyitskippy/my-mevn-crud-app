@@ -12,9 +12,7 @@ import { defineStore } from 'pinia'
 
 import { cloneDeep } from '_/helpers'
 
-import { DEFAULT_TOASTER_STATE } from '@/constants'
-
-const STORE_KEY = 'my-mevn-crud-app'
+import { DEFAULT_TOASTER_STATE, STORE_KEY } from '@/constants'
 
 export const useUiStore = defineStore('ui', () => {
   /**

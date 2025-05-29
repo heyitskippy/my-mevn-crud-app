@@ -15,9 +15,9 @@ export const connectDB = async () => {
   try {
     db = await mongoose.connect(url)
 
-    console.log('\nMongoDB: connected!')
+    console.log('\nMongoDB📦: connected!')
   } catch (e: any) {
-    console.error('\nMongoDB: connection failed!', e.message)
+    console.error('\nMongoDB❌: connection failed!', e.message)
     process.exit(1)
   }
 
@@ -28,8 +28,8 @@ export const disconnectDB = async () => {
   try {
     await mongoose.disconnect()
 
-    console.log('\nMongoDB: disconnected!')
+    console.log('\nMongoDBℹ️ : disconnected!')
   } catch (e: any) {
-    console.error('\nMongoDB:', e.message)
+    console.error('\nMongoDB❌:', e.message)
   }
 }

@@ -1,5 +1,5 @@
-import mongoose from 'mongoose'
 import { describe, expect, it, vi } from 'vitest'
+import mongoose from 'mongoose'
 
 import { connectDB, disconnectDB } from '../databaseConfig'
 

@@ -71,7 +71,13 @@ const menu = computed(() =>
             {{ currentUser.email }}
           </div>
 
-          <MyBtn title="Logout" btn-icon aria-label="Logout" @click="authStore.logout">
+          <MyBtn
+            title="Logout"
+            btn-icon
+            aria-label="Logout"
+            data-test="logout"
+            @click="authStore.logout"
+          >
             <ArrowRightEndOnRectangleIcon />
           </MyBtn>
         </div>

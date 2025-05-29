@@ -1,15 +1,25 @@
 import { faker } from '@faker-js/faker'
 
-describe('users', () => {
+const resource = 'users'
+
+describe(resource, () => {
+  const ADMIN_EMAIL = Cypress.env('VITE_ADMIN_EMAIL')
+  const ADMIN_PASSWORD = Cypress.env('VITE_ADMIN_PASSWORD')
+
+  beforeEach(() => {
+    cy.login(ADMIN_EMAIL, ADMIN_PASSWORD)
+    cy.intercept('GET', '**/users').as('getUsers')
+    cy.wait('@getUsers')
+    cy.get('[data-test="cell"]').should('exist')
+  })
+
   it("get users' list", () => {
-    cy.visit('/users/list')
     cy.contains('h1', 'Users')
 
     cy.get('[data-test="cell"]').should('have.length.gt', 0)
   })
 
   it('get user by id', () => {
-    cy.visit('/users/list')
     cy.get('[data-test="cell"]').first().click()
 
     cy.contains('h1', 'User: edit')
@@ -23,10 +33,9 @@ describe('users', () => {
     const user = {
       fullName: faker.person.fullName().replace("'", ' '),
       email: faker.internet.email().toLowerCase(),
-      password: '!1' + faker.internet.password({ length: 6 }),
+      password: '!Tlaz22QC' + faker.internet.password({ length: 2 }),
     }
 
-    cy.visit('/users/list')
     cy.get('[name="create"]').click()
 
     cy.contains('h1', 'User: create')
@@ -39,7 +48,7 @@ describe('users', () => {
 
     cy.get('button[type="submit"]').click()
 
-    cy.url().should('include', '/users/list')
+    cy.url().should('include', `${resource}/list`)
 
     cy.get('.my-table-row').first().should('have.class', 'blue')
 
@@ -52,9 +61,8 @@ describe('users', () => {
 
   it('update user (with password)', () => {
     const fullName = faker.person.fullName().replace("'", ' ')
-    const password = '!1' + faker.internet.password({ length: 6 })
+    const password = '!Tlaz22QC' + faker.internet.password({ length: 2 })
 
-    cy.visit('/users/list')
     cy.get('[data-test="cell"]').first().click()
 
     cy.get('button[type="submit"]').should('be.disabled')
@@ -66,18 +74,21 @@ describe('users', () => {
 
     cy.get('button[type="submit"]').click()
 
-    cy.url().should('include', '/users/list')
+    cy.url().should('include', `${resource}/list`)
 
-    cy.get('.my-table-row').first().should('have.class', 'yellow')
+    cy.get('.my-table-row')
+      .first()
+      .should('have.class', 'yellow')
+      .within(() => {
+        cy.get('[name="save"]').should('exist').click({ force: true })
+      })
 
-    cy.get('.my-table-row').first().find('[name="save"]').click({ force: true })
-    cy.get('.my-table-row').first().should('have.class', 'green').contains(fullName)
+    cy.get('.my-table-row').first().should('have.class', 'green').and('contain', fullName)
   })
 
   it('update user (without password)', () => {
     const fullName = faker.person.fullName().replace("'", ' ')
 
-    cy.visit('/users/list')
     cy.get('[data-test="cell"]').first().click()
 
     cy.get('button[type="submit"]').should('be.disabled')
@@ -87,7 +98,7 @@ describe('users', () => {
 
     cy.get('button[type="submit"]').click()
 
-    cy.url().should('include', '/users/list')
+    cy.url().should('include', `${resource}/list`)
 
     cy.get('.my-table-row').first().should('have.class', 'yellow')
 
@@ -96,8 +107,6 @@ describe('users', () => {
   })
 
   it('delete user', () => {
-    cy.visit('/users/list')
-
     cy.get('[data-test-key="r-0-c-fullName"]').then(($cell) => {
       const fullName = $cell.text()
 
@@ -105,7 +114,7 @@ describe('users', () => {
 
       cy.get('button[type="button"]').click()
 
-      cy.url().should('include', '/users/list')
+      cy.url().should('include', `${resource}/list`)
 
       cy.get('.my-table-row').first().should('have.class', 'red').contains(fullName)
       cy.get('.my-table-row').first().find('[name="delete"]').click({ force: true })
@@ -113,8 +122,6 @@ describe('users', () => {
   })
 
   it('create and update user at the same time', () => {
-    cy.visit('/users/list')
-
     cy.get('[data-test="cell"]').first().click()
 
     const fullName = faker.person.fullName().replace("'", ' ')
